@@ -9,6 +9,7 @@ def import_data():
         "_Adaptive_methods_for_data_based_decision_making/main/"
         "project1/data/observation_features.csv.zip",
         header=None,
+        compression='zip',
     )
 
     treatment_features = read_csv(
@@ -16,6 +17,7 @@ def import_data():
         "_Adaptive_methods_for_data_based_decision_making/main/"
         "project1/data/treatment_features.csv.zip",
         header=None,
+        compression='zip',
     )
 
     treatment_action = read_csv(
@@ -23,6 +25,7 @@ def import_data():
         "_Adaptive_methods_for_data_based_decision_making/main/"
         "project1/data/treatment_actions.csv.zip",
         header=None,
+        compression='zip',
     )
 
     treatment_outcome = read_csv(
@@ -30,6 +33,7 @@ def import_data():
         "_Adaptive_methods_for_data_based_decision_making/main/"
         "project1/data/treatment_outcomes.csv.zip",
         header=None,
+        compression='zip',
     )
 
     return (observation_features, treatment_features, treatment_action,
