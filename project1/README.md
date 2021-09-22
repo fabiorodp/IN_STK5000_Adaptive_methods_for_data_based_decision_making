@@ -9,13 +9,13 @@ Aurora Poggi: ...@uio.no
 
 
 ## **Data source:**
-[observation_features.csv](https://raw.githubusercontent.com/fabiorodp/IN_STK5000_Adaptive_methods_for_data_based_decision_making/main/project1/data/observation_features.csv)
+[observation_features.csv.gz](https://raw.githubusercontent.com/fabiorodp/IN_STK5000_Adaptive_methods_for_data_based_decision_making/main/project1/data/observation_features.csv.gz)
 
-[treatment_features.csv](https://raw.githubusercontent.com/fabiorodp/IN_STK5000_Adaptive_methods_for_data_based_decision_making/main/project1/data/treatment_features.csv)
+[treatment_features.csv.gz](https://raw.githubusercontent.com/fabiorodp/IN_STK5000_Adaptive_methods_for_data_based_decision_making/main/project1/data/treatment_features.csv.gz)
 
-[treatment_action.csv](https://raw.githubusercontent.com/fabiorodp/IN_STK5000_Adaptive_methods_for_data_based_decision_making/main/project1/data/treatment_actions.csv)
+[treatment_action.csv.gz](https://raw.githubusercontent.com/fabiorodp/IN_STK5000_Adaptive_methods_for_data_based_decision_making/main/project1/data/treatment_actions.csv.gz)
 
-[treatment_outcome.csv](https://raw.githubusercontent.com/fabiorodp/IN_STK5000_Adaptive_methods_for_data_based_decision_making/main/project1/data/treatment_outcomes.csv)
+[treatment_outcome.csv.gz](https://raw.githubusercontent.com/fabiorodp/IN_STK5000_Adaptive_methods_for_data_based_decision_making/main/project1/data/treatment_outcomes.csv.gz)
 
 ## **Description of the features:**
 Symptoms (10 bits): Covid-Recovered, Covid-Positive, No-Taste/Smell, Fever, Headache, Pneumonia, Stomach, Myocarditis, Blood-Clots, Death
