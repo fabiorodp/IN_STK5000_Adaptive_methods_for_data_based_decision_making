@@ -40,11 +40,9 @@ plot_heatmap_corr(
             'Stomach', 'Myocarditis', 'Blood-Clots', 'Death'],
     _show=True
 )
-# covid + Stomach has 12% of correlation
-# covid + Blood-Clots has 7.8% of correlation
-# the rest has not a significant correlation
+# not a significant correlation among symptoms
 
 # How many people died?
 infected[9].value_counts()
-# 0.0    2204
-# 1.0      33   --> only 33 people??
+# 0.0    21717
+# 1.0      311   --> only 311 people??
