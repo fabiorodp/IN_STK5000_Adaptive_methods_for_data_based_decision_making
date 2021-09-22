@@ -26,16 +26,15 @@ n_jobs = -1
  treatment_outcome) = import_data()
 
 # separating infected and not
-infected = observation_features[observation_features['0.0.1'] == 1.].drop(
-    ['0.0.1'], axis=1)
-not_infected = observation_features[observation_features['0.0.1'] == 0.].drop(
-    ['0.0.1'], axis=1)
+infected = observation_features[observation_features[1] == 1.].drop(
+    [1], axis=1)
+not_infected = observation_features[observation_features[1] == 0.].drop(
+    [1], axis=1)
 
 # checking correlations of the symptoms (No-Taste/Smell, Fever, Headache,
 # Pneumonia, Stomach, Myocarditis, Blood-Clots, Death)
 plot_heatmap_corr(
-    df=infected[['0.0.2', '0.0.3', '0.0.4', '0.0.5', '0.0.6',
-                 '0.0.7', '0.0.8', '0.0.9']],
+    df=infected[[2, 3, 4, 5, 6, 7, 8, 9]],
     labels=['No-Taste/Smell', 'Fever', 'Headache', 'Pneumonia',
             'Stomach', 'Myocarditis', 'Blood-Clots', 'Death'],
     _show=True
@@ -45,6 +44,6 @@ plot_heatmap_corr(
 # the rest has not a significant correlation
 
 # How many people died?
-infected['0.0.9'].value_counts()
+infected[9].value_counts()
 # 0.0    2204
 # 1.0      33   --> only 33 people??
