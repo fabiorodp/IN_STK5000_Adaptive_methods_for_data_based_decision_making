@@ -11,6 +11,7 @@ import pandas as pd
 import numpy as np
 import scipy.stats
 
+
 try:
     from helper.help_functions import import_data, plot_heatmap_corr
 except:
@@ -39,11 +40,11 @@ plot_heatmap_corr(
             'Stomach', 'Myocarditis', 'Blood-Clots', 'Death'],
     _show=True
 )
+# covid + Stomach has 12% of correlation
+# covid + Blood-Clots has 7.8% of correlation
+# the rest has not a significant correlation
 
-plot_heatmap_corr(
-    df=not_infected[['0.0.2', '0.0.3', '0.0.4', '0.0.5', '0.0.6',
-                     '0.0.7', '0.0.8', '0.0.9']],
-    labels=['No-Taste/Smell', 'Fever', 'Headache', 'Pneumonia',
-            'Stomach', 'Myocarditis', 'Blood-Clots', 'Death'],
-    _show=True
-)
+# How many people died?
+infected['0.0.9'].value_counts()
+# 0.0    2204
+# 1.0      33   --> only 33 people??
