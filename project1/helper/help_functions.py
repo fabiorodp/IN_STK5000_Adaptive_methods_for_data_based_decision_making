@@ -1,4 +1,6 @@
 from pandas import read_csv
+from seaborn import heatmap
+from matplotlib.pyplot import show
 
 
 def import_data():
@@ -24,3 +26,21 @@ def import_data():
 
     return (observation_features, treatment_features, treatment_action,
             treatment_outcome)
+
+
+def plot_heatmap_corr(df, labels, _show=False):
+    plot = heatmap(
+        df.corr(),
+        annot=True,
+        yticklabels=labels,
+        linewidths=.5,
+    ).set_xticklabels(
+        labels,
+        rotation=90,
+    )
+
+    # sns.set(font_scale=0.7)
+
+    show() if _show is True else None
+
+    return plot
