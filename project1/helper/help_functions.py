@@ -37,7 +37,7 @@ def import_data():
 
 
 def plot_heatmap_corr(df, labels, _show=False):
-    plot = heatmap(
+    heatmap(
         df.corr(),
         annot=True,
         yticklabels=labels,
@@ -46,9 +46,24 @@ def plot_heatmap_corr(df, labels, _show=False):
         labels,
         rotation=90,
     )
-
     # sns.set(font_scale=0.7)
-
     show() if _show is True else None
 
-    return plot
+
+def age_analysis(df, plot_box=False, plot_dist=False):
+    # How many of death per age?
+    df[10].plot.box()
+    show() if plot_box is True else None
+
+    # people with > 120 years old?
+    print(f"Number of deaths with over 120 years old: "
+          f"{df[10][df[10] > 120].count()}")
+
+    # age mean of the deaths
+    print(f"Age mean of the deaths: "
+          f"{df[10][df[9] == 1.0].mean()}")
+
+    # density of the ages given they are dead
+    df[10][df[9] == 1.0].plot.density()
+    show() if plot_dist is True else None
+    # kind of normal distribution
