@@ -24,6 +24,8 @@ Age (integer)
 
 Gender (binary)
 
+Income (floating)
+
 Genome (128 bits)
 
 Comorbidities (6 bits): Asthma, Obesity, Smoking, Diabetes, Heart disease, Hypertension
