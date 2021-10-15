@@ -4,63 +4,130 @@ import seaborn as sns
 import pandas as pd
 import numpy as np
 
-N = 100000
 
-_feature_covid_recovered = np.random.binomial(1, 0.03, N)[:, np.newaxis]
-_feature_covid_positive = np.random.binomial(1, 0.3, N)[:, np.newaxis]
+def generate_data(N=100000):
+    _feature_covid_recovered = np.random.binomial(1, 0.03, N)[:, np.newaxis]
+    _feature_covid_positive = np.random.binomial(1, 0.3, N)[:, np.newaxis]
 
-_feature_symptoms = np.random.randint(
-    low=0,
-    high=8,
-    size=N
-)[:, np.newaxis]
+    _feature_symptoms = np.random.randint(
+        low=0,
+        high=8,
+        size=N
+    )[:, np.newaxis]
 
-_feature_symptoms = \
-    OneHotEncoder(sparse=False).fit_transform(_feature_symptoms)[:, 1:]
+    _feature_symptoms = \
+        OneHotEncoder(sparse=False).fit_transform(_feature_symptoms)[:, 1:]
 
-_feature_death = np.zeros(N)[:, np.newaxis]
-_feature_ages = np.random.randint(1, 100, N)[:, np.newaxis]
-_feature_gender = np.random.binomial(1, 0.5, N)[:, np.newaxis]
+    _feature_death = np.zeros(N)[:, np.newaxis]
+    _feature_ages = np.random.randint(1, 100, N)[:, np.newaxis]
+    _feature_gender = np.random.binomial(1, 0.5, N)[:, np.newaxis]
 
-_feature_income = np.random.normal(25000, 10000, N)[:, np.newaxis]
-_feature_income[_feature_income <= 10] = 0
+    _feature_income = np.random.normal(25000, 10000, N)[:, np.newaxis]
+    _feature_income[_feature_income <= 10] = 0
 
-_feature_genes = {}
-for i in range(128):
-    _feature_genes[f'g{i+1}'] = np.random.binomial(1, 0.25, N)
+    _feature_genes = {}
+    for i in range(128):
+        _feature_genes[f'g{i+1}'] = np.random.binomial(1, 0.25, N)
 
-_feature_asthma = np.random.binomial(1, 0.07, N)[:, np.newaxis]
-_feature_obesity = np.random.binomial(1, 0.13, N)[:, np.newaxis]
-_feature_smoking = np.random.binomial(1, 0.19, N)[:, np.newaxis]
-_feature_diabetes = np.random.binomial(1, 0.10, N)[:, np.newaxis]
-_feature_heart_disease = np.random.binomial(1, 0.10, N)[:, np.newaxis]
-_feature_hypertension = np.random.binomial(1, 0.17, N)[:, np.newaxis]
+    _feature_asthma = np.random.binomial(1, 0.07, N)[:, np.newaxis]
+    _feature_obesity = np.random.binomial(1, 0.13, N)[:, np.newaxis]
+    _feature_smoking = np.random.binomial(1, 0.19, N)[:, np.newaxis]
+    _feature_diabetes = np.random.binomial(1, 0.10, N)[:, np.newaxis]
+    _feature_heart_disease = np.random.binomial(1, 0.10, N)[:, np.newaxis]
+    _feature_hypertension = np.random.binomial(1, 0.17, N)[:, np.newaxis]
 
-_feature_vaccines = np.random.randint(
-    low=0,
-    high=4,
-    size=N
-)[:, np.newaxis]
+    _feature_vaccines = np.random.randint(
+        low=0,
+        high=4,
+        size=N
+    )[:, np.newaxis]
 
-_feature_vaccines = \
-    OneHotEncoder(sparse=False).fit_transform(_feature_vaccines)[:, 1:]
+    _feature_vaccines = \
+        OneHotEncoder(sparse=False).fit_transform(_feature_vaccines)[:, 1:]
 
-features = [
-    pd.DataFrame(_feature_covid_recovered, columns=['Covid-Recovered']),
-    pd.DataFrame(_feature_covid_positive, columns=['Covid-Positive']),
-    pd.DataFrame(_feature_symptoms, columns=['No-Taste/Smell', 'Fever', 'Headache', 'Pneumonia', 'Stomach', 'Myocarditis', 'Blood-Clots', ]),
-    pd.DataFrame(_feature_death, columns=['Death']),
-    pd.DataFrame(_feature_ages, columns=['Age']),
-    pd.DataFrame(_feature_gender, columns=['Gender']),
-    pd.DataFrame(_feature_income, columns=['Income']),
-    pd.DataFrame(_feature_genes),
-    pd.DataFrame(_feature_asthma, columns=['Asthma']),
-    pd.DataFrame(_feature_obesity, columns=['Obesity']),
-    pd.DataFrame(_feature_smoking, columns=['Smoking']),
-    pd.DataFrame(_feature_diabetes, columns=['Diabetes']),
-    pd.DataFrame(_feature_heart_disease, columns=['Heart-disease']),
-    pd.DataFrame(_feature_hypertension, columns=['Hypertension']),
-    pd.DataFrame(_feature_vaccines, columns=['Vaccine1', 'Vaccine2', 'Vaccine3']),
-]
+    features = [
+        pd.DataFrame(_feature_covid_recovered, columns=['Covid-Recovered']),
+        pd.DataFrame(_feature_covid_positive, columns=['Covid-Positive']),
+        pd.DataFrame(_feature_symptoms, columns=['No-Taste/Smell', 'Fever', 'Headache', 'Pneumonia', 'Stomach', 'Myocarditis', 'Blood-Clots', ]),
+        pd.DataFrame(_feature_death, columns=['Death']),
+        pd.DataFrame(_feature_ages, columns=['Age']),
+        pd.DataFrame(_feature_gender, columns=['Gender']),
+        pd.DataFrame(_feature_income, columns=['Income']),
+        pd.DataFrame(_feature_genes),
+        pd.DataFrame(_feature_asthma, columns=['Asthma']),
+        pd.DataFrame(_feature_obesity, columns=['Obesity']),
+        pd.DataFrame(_feature_smoking, columns=['Smoking']),
+        pd.DataFrame(_feature_diabetes, columns=['Diabetes']),
+        pd.DataFrame(_feature_heart_disease, columns=['Heart-disease']),
+        pd.DataFrame(_feature_hypertension, columns=['Hypertension']),
+        pd.DataFrame(_feature_vaccines, columns=['Vaccine1', 'Vaccine2', 'Vaccine3']),
+    ]
 
-df = pd.concat(features)
+    df = pd.concat(features, axis=1)
+
+    # fixing income to zero for people below 18 years old
+    df['Income'].where(df['Age'] > 18, 0, inplace=True)
+    return df
+
+
+def defining_conditional_probabilities():
+    ages_ = np.array([20, 40, 60, 80, 100])
+    diabetes_ = np.array([0, 1])
+    hypertension_ = np.array([0, 1])
+    g1g2_ = np.array([0, 2])
+    v1_ = np.array([0, 1])
+    v2_ = np.array([0, 1])
+    v3_ = np.array([0, 1])
+
+    cond_probs = np.array(
+        np.meshgrid(ages_, diabetes_, hypertension_, g1g2_, v1_, v2_, v3_)
+    ).T.reshape(-1, 7)
+
+    prob_ages_ = {20: 0.05, 40: 0.15, 60: 0.25, 80: 0.50, 100: 0.75}
+    prob_diabetes_ = {0: 0., 1: 0.05}
+    prob_hypertension_ = {0: 0., 1: 0.05}
+    prob_g1g2_ = {0: 0., 2: 0.10}
+    prob_v1_ = {0: 0., 1: -0.10}
+    prob_v2_ = {0: 0., 1: -0.30}
+    prob_v3_ = {0: 0., 1: -0.50}
+
+    probs = np.zeros((len(cond_probs),))
+    idx_probs = 0
+    for idx_r, r in enumerate(cond_probs):
+
+        p = prob_ages_[cond_probs[idx_r, 0]] + \
+            prob_diabetes_[cond_probs[idx_r, 1]] + \
+            prob_hypertension_[cond_probs[idx_r, 2]] + \
+            prob_g1g2_[cond_probs[idx_r, 3]] + \
+            prob_v1_[cond_probs[idx_r, 4]] + \
+            prob_v2_[cond_probs[idx_r, 5]] + \
+            prob_v3_[cond_probs[idx_r, 6]]
+
+        if p <= 0.01:
+            probs[idx_probs] = 0.01
+        elif p >= 0.9:
+            probs[idx_probs] = 0.90
+        else:
+            probs[idx_probs] = p
+        idx_probs += 1
+
+    cond_probs = pd.concat(
+        [
+            pd.DataFrame(
+                cond_probs,
+                columns=['Age', 'Diabetes', 'Hypertension',
+                         'G1+G2', 'V1', 'V2', 'V3']
+            ),
+            pd.DataFrame(
+                probs[:, np.newaxis],
+                columns=['Probabilities']
+            )
+        ], axis=1)
+
+    return cond_probs
+
+
+if __name__ == '__main__':
+    df = generate_data(N=100000)
+    cond_probs = defining_conditional_probabilities()
+
