@@ -83,7 +83,7 @@ def defining_conditional_probabilities():
         np.meshgrid(ages_, diabetes_, hypertension_, g1g2_, v1_, v2_, v3_)
     ).T.reshape(-1, 7)
 
-    prob_ages_ = {20: 0.05, 40: 0.15, 60: 0.25, 80: 0.50, 100: 0.75}
+    prob_ages_ = {20: 0.05, 40: 0.15, 60: 0.25, 80: 0.50, 100: 0.70}
     prob_diabetes_ = {0: 0., 1: 0.05}
     prob_hypertension_ = {0: 0., 1: 0.05}
     prob_g1g2_ = {0: 0., 2: 0.10}
@@ -106,7 +106,7 @@ def defining_conditional_probabilities():
         if p <= 0.01:
             probs[idx_probs] = 0.01
         elif p >= 0.9:
-            probs[idx_probs] = 0.90
+            probs[idx_probs] = 0.9
         else:
             probs[idx_probs] = p
         idx_probs += 1
@@ -124,10 +124,63 @@ def defining_conditional_probabilities():
             )
         ], axis=1)
 
-    return cond_probs
+    cond_probs_dict = {}
+    for i in range(len(cond_probs)):
+        key = f"{int(cond_probs.iloc[i, :]['Age'])}" + \
+              f"{int(cond_probs.iloc[i, :]['Diabetes'])}" + \
+              f"{int(cond_probs.iloc[i, :]['Hypertension'])}" + \
+              f"{int(cond_probs.iloc[i, :]['G1+G2'])}" + \
+              f"{int(cond_probs.iloc[i, :]['V1'])}" + \
+              f"{int(cond_probs.iloc[i, :]['V2'])}" + \
+              f"{int(cond_probs.iloc[i, :]['V3'])}"
+
+        cond_probs_dict[key] = cond_probs.iloc[i, -1]
+
+    return cond_probs, cond_probs_dict
+
+
+def help_age(given_age):
+    if given_age <= 20:
+        return 20
+    elif given_age <= 40:
+        return 40
+    elif given_age <= 60:
+        return 60
+    elif given_age <= 80:
+        return 80
+    else:
+        return 100
+
+
+def help_gene(given_gene):
+    if given_gene == 1:
+        return 0
+    else:
+        return given_gene
+
+
+def assigning_death(df, cond_probs_dict):
+    new_death = []
+    for i in range(len(df)):
+        if df.iloc[i]['Covid-Positive'] == 1:
+            find = f"{int(help_age(given_age=df.iloc[i]['Age']))}" + \
+                   f"{int(df.iloc[i]['Diabetes'])}" + \
+                   f"{int(df.iloc[i]['Hypertension'])}" + \
+                   f"{int(help_gene(given_gene=df.iloc[i]['g1'] + df.iloc[i]['g2']))}" + \
+                   f"{int(df.iloc[i]['Vaccine1'])}" + \
+                   f"{int(df.iloc[i]['Vaccine2'])}" + \
+                   f"{int(df.iloc[i]['Vaccine3'])}"
+            new_death.append(np.random.binomial(1, cond_probs_dict[find]))
+
+        else:
+            new_death.append(np.random.binomial(1, 0.05))
+
+    df['Death'] = new_death
+    return df
 
 
 if __name__ == '__main__':
-    df = generate_data(N=100000)
-    cond_probs = defining_conditional_probabilities()
-
+    data = generate_data(N=100000)
+    cond_probs, cond_probs_dict = defining_conditional_probabilities()
+    df = assigning_death(df=data, cond_probs_dict=cond_probs_dict)
+    corr_mtx = df.corr()
