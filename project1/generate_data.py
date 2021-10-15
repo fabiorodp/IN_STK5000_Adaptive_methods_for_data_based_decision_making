@@ -4,6 +4,14 @@ import seaborn as sns
 import pandas as pd
 import numpy as np
 
+from sklearn.preprocessing import StandardScaler, MaxAbsScaler, MinMaxScaler
+from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
+from sklearn.linear_model import LogisticRegressionCV
+from pipelinehelper import PipelineHelper
+from sklearn.pipeline import Pipeline
+from sklearn.decomposition import PCA
+from sklearn.utils import resample
+
 
 def generate_data(N=100000):
     _feature_covid_recovered = np.random.binomial(1, 0.03, N)[:, np.newaxis]
@@ -84,11 +92,11 @@ def defining_conditional_probabilities():
     ).T.reshape(-1, 7)
 
     prob_ages_ = {20: 0.05, 40: 0.15, 60: 0.25, 80: 0.50, 100: 0.70}
-    prob_diabetes_ = {0: 0., 1: 0.05}
-    prob_hypertension_ = {0: 0., 1: 0.05}
-    prob_g1g2_ = {0: 0., 2: 0.10}
-    prob_v1_ = {0: 0., 1: -0.10}
-    prob_v2_ = {0: 0., 1: -0.30}
+    prob_diabetes_ = {0: 0., 1: 0.30}
+    prob_hypertension_ = {0: 0., 1: 0.30}
+    prob_g1g2_ = {0: 0., 2: 0.90}
+    prob_v1_ = {0: 0., 1: -0.30}
+    prob_v2_ = {0: 0., 1: -0.40}
     prob_v3_ = {0: 0., 1: -0.50}
 
     probs = np.zeros((len(cond_probs),))
@@ -180,7 +188,27 @@ def assigning_death(df, cond_probs_dict):
 
 
 if __name__ == '__main__':
+    print("Generating Data....\n")
     data = generate_data(N=100000)
     cond_probs, cond_probs_dict = defining_conditional_probabilities()
     df = assigning_death(df=data, cond_probs_dict=cond_probs_dict)
-    corr_mtx = df.corr()
+    #corr_mtx = df.corr()
+
+    print("Fitting Model....\n")
+    #pca = PCA()
+    #pca.fit(df)
+
+    #print(pd.DataFrame(pca.components_,columns=df.columns))
+
+    df_dead = df[df["Death"] == 1.0]
+    df_not_dead = df[df["Death"] == 0.0].iloc[:df_dead.shape[0], :]
+    df_balanced = pd.concat([df_dead, df_not_dead])
+
+    clf = LogisticRegressionCV(penalty='l2',max_iter=200)
+
+    clf.fit(df_balanced.drop(["Death"], axis=1).to_numpy(), df_balanced["Death"])
+    idx = 0
+    for c in clf.coef_[0]:
+        print(idx, c)
+        idx += 1
+    print(clf.scores_)
