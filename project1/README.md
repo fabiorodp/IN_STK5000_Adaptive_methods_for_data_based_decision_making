@@ -3,9 +3,9 @@
 ## **Students:**
 Fábio Rodrigues Pereira : fabior@uio.no
 
-Nicholas Walker : ...@uio.no
+Nicholas Walker : walker@nr.no
 
-Aurora Poggi: ...@uio.no
+Aurora Poggi: aurorapo@uio.no
 
 
 ## **Data source:**
