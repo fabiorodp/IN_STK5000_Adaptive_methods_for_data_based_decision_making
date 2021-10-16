@@ -1,16 +1,6 @@
 from sklearn.preprocessing import OneHotEncoder
-import matplotlib.pyplot as plt
-import seaborn as sns
 import pandas as pd
 import numpy as np
-
-from sklearn.preprocessing import StandardScaler, MaxAbsScaler, MinMaxScaler
-from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
-from sklearn.linear_model import LogisticRegressionCV
-# from pipelinehelper import PipelineHelper
-from sklearn.pipeline import Pipeline
-from sklearn.decomposition import PCA
-from sklearn.utils import resample
 
 
 class Space:
@@ -189,7 +179,8 @@ class Space:
         else:
             return given_gene
 
-    def __init__(self, N=100000, add_treatment=False):
+    def __init__(self, N=100000, add_treatment=False, seed=1):
+        np.random.seed(seed)
         self.N = N
         self.add_treatment = add_treatment
         self.space = self.init_random_space(self.N, self.add_treatment)
