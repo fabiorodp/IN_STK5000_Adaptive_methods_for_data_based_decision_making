@@ -4,6 +4,7 @@ import numpy as np
 
 
 class Space:
+    """Class function to create the Synthetic data."""
 
     @staticmethod
     def init_random_space(N, add_treatment):

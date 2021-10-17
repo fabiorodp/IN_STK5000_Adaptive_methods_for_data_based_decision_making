@@ -7,6 +7,9 @@ except:
     from project1.helper.methodologies import methodology1, methodology2, methodology3
     from project1.helper.help_functions import balance_data, import_data
 
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import cross_val_score
+
 # ################################################## Synthetic data
 omega_1 = Space(N=100000, add_treatment=False, seed=1)
 omega_1.assign_corr_death()
@@ -63,4 +66,22 @@ real_model = methodology3(
     seed=1,
     n_jobs=-1
 )
+
+best_model = LogisticRegression(
+    solver='saga',
+    random_state=1,
+    n_jobs=-1,
+    C=0.1,
+    max_iter=500
+)
+
+output = cross_val_score(
+    estimator=best_model,
+    X=df_balanced.drop(['Death'], axis=1),
+    y=df_balanced['Death'],
+    scoring='accuracy',
+    cv=10,
+    n_jobs=-1
+)
+
 # ##################################################
