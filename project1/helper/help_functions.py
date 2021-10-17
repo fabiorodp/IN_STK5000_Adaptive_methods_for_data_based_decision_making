@@ -84,6 +84,7 @@ def age_analysis(df, plot_box=False, plot_dist=False):
 
 
 def balance_data(data):
+    """Balancing targets."""
     df_dead = data[data["Death"] == 1.0]
     df_not_dead = data[data["Death"] == 0.0].iloc[
                   :df_dead.shape[0], :]

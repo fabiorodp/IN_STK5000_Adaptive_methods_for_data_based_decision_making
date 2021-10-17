@@ -23,7 +23,7 @@ syn_neg_corr, syn_pos_corr = methodology1(data=omega_1.space)
 
 methodology2(
     data=omega_1 .space,
-    explanatories=['Age', 'G1', 'G2', 'Diabetes',
+    explanatories=['Age', 'g1', 'g2', 'Diabetes',
                    'Hypertension', 'Income'],
     responses=['Death', 'Pneumonia', 'No_Taste/Smell']
 )
@@ -48,9 +48,9 @@ real_neg_corr, real_os_corr = methodology1(data=observation_features)
 
 methodology2(
     data=observation_features,
-    explanatories=['Age', 'G1', 'G2', 'Diabetes',
+    explanatories=['Age', 'g1', 'g2', 'Diabetes',
                    'Hypertension', 'Income'],
-    responses=['Death', 'Pneumonia', 'No_Taste/Smell']
+    responses=['Death', 'Pneumonia', 'No-Taste/Smell']
 )
 
 df_balanced = balance_data(data=observation_features)
