@@ -1,6 +1,7 @@
 from pandas import read_csv
 from seaborn import heatmap
 from matplotlib.pyplot import show
+import pandas as pd
 
 
 def import_data():
@@ -31,6 +32,18 @@ def import_data():
         "project1/data/treatment_outcomes.csv.gz",
         header=None,
     )
+
+    labels = ['Covid-Recovered', 'Covid-Positive', 'No-Taste/Smell',
+              'Fever', 'Headache', 'Pneumonia', 'Stomach', 'Myocarditis',
+              'Blood-Clots', 'Death', 'Age', 'Gender', 'Income'] + \
+             [f'G{i}' for i in range(1, 129)] + \
+             ['Asthma', 'Obesity', 'Smoking', 'Diabetes', 'Heart-disease',
+              'Hypertension', 'Vaccine1', 'Vaccine2', 'Vaccine3']
+
+    observation_features.columns = labels
+    treatment_features.columns = labels
+    treatment_action.columns = ['Treatment 1', 'Treatment 2']
+    treatment_outcome.columns = labels[0:10]
 
     return (observation_features, treatment_features, treatment_action,
             treatment_outcome)
@@ -67,3 +80,13 @@ def age_analysis(df, plot_box=False, plot_dist=False):
     df[10][df[9] == 1.0].plot.density()
     show() if plot_dist is True else None
     # kind of normal distribution
+
+
+def balance_data(data):
+    df_dead = data[data["Death"] == 1.0]
+    df_not_dead = data[data["Death"] == 0.0].iloc[
+                  :df_dead.shape[0], :]
+    df_balanced = pd.concat([df_dead, df_not_dead])
+    df_balanced = df_balanced[df_balanced['Covid-Positive'] == 1].drop(
+        ['Covid-Positive'], axis=1)
+    return df_balanced

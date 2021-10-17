@@ -222,13 +222,3 @@ class Space:
                 new_.append(np.random.binomial(1, 0.05))
         self.space[response_label] = new_
         self.space_corr_mtx = self.space.corr()
-
-
-if __name__ == '__main__':
-    print("Generating Data....\n")
-    omega = Space(N=100000, add_treatment=True)
-    omega.assign_corr_death()
-    omega.add_correlated_symptom_with(
-        explanatory_label='Covid-Positive',  # 'Covid-Positive' or 'Treatment1'
-        response_label='Fever',
-        p=0.9)
