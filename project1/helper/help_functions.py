@@ -5,6 +5,7 @@ import pandas as pd
 
 
 def import_data():
+    """Import real data from GitHub."""
     observation_features = read_csv(
         "https://raw.githubusercontent.com/fabiorodp/IN_STK5000"
         "_Adaptive_methods_for_data_based_decision_making/main/"
@@ -36,7 +37,7 @@ def import_data():
     labels = ['Covid-Recovered', 'Covid-Positive', 'No-Taste/Smell',
               'Fever', 'Headache', 'Pneumonia', 'Stomach', 'Myocarditis',
               'Blood-Clots', 'Death', 'Age', 'Gender', 'Income'] + \
-             [f'G{i}' for i in range(1, 129)] + \
+             [f'g{i}' for i in range(1, 129)] + \
              ['Asthma', 'Obesity', 'Smoking', 'Diabetes', 'Heart-disease',
               'Hypertension', 'Vaccine1', 'Vaccine2', 'Vaccine3']
 
