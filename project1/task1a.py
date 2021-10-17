@@ -75,7 +75,7 @@ best_model = LogisticRegression(
     max_iter=500
 )
 
-output = cross_val_score(
+cross_validated_results = cross_val_score(
     estimator=best_model,
     X=df_balanced.drop(['Death'], axis=1),
     y=df_balanced['Death'],
@@ -83,5 +83,12 @@ output = cross_val_score(
     cv=10,
     n_jobs=-1
 )
+
+best_model.fit(
+    X=df_balanced.drop(['Death'], axis=1),
+    y=df_balanced['Death'],
+)
+
+best_model_coeffs = best_model.coef_
 
 # ##################################################
