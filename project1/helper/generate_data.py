@@ -61,7 +61,7 @@ class Space:
             pd.DataFrame(_feature_covid_recovered,
                          columns=['Covid-Recovered']),
             pd.DataFrame(_feature_covid_positive, columns=['Covid-Positive']),
-            pd.DataFrame(_feature_symptoms, columns=['No-Taste/Smell', 'Fever',
+            pd.DataFrame(_feature_symptoms, columns=['No_Taste/Smell', 'Fever',
                                                      'Headache', 'Pneumonia',
                                                      'Stomach', 'Myocarditis',
                                                      'Blood-Clots', ]),

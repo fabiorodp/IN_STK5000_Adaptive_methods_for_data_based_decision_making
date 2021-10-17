@@ -34,7 +34,7 @@ def import_data():
         header=None,
     )
 
-    labels = ['Covid-Recovered', 'Covid-Positive', 'No-Taste/Smell',
+    labels = ['Covid-Recovered', 'Covid-Positive', 'No_Taste/Smell',
               'Fever', 'Headache', 'Pneumonia', 'Stomach', 'Myocarditis',
               'Blood-Clots', 'Death', 'Age', 'Gender', 'Income'] + \
              [f'g{i}' for i in range(1, 129)] + \
@@ -83,10 +83,10 @@ def age_analysis(df, plot_box=False, plot_dist=False):
     # kind of normal distribution
 
 
-def balance_data(data):
+def balance_data(data, param='Death'):
     """Balancing targets."""
-    df_dead = data[data["Death"] == 1.0]
-    df_not_dead = data[data["Death"] == 0.0].iloc[
+    df_dead = data[data[param] == 1.0]
+    df_not_dead = data[data[param] == 0.0].iloc[
                   :df_dead.shape[0], :]
     df_balanced = pd.concat([df_dead, df_not_dead])
     df_balanced = df_balanced[df_balanced['Covid-Positive'] == 1].drop(

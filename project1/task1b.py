@@ -11,26 +11,30 @@ from sklearn.linear_model import LogisticRegression
 from yellowbrick.model_selection import feature_importances
 
 # ################################################## Synthetic data
-omega_1 = Space(N=100000, add_treatment=False, seed=1)
-omega_1.assign_corr_death()
-omega_1.add_correlated_symptom_with(
-    explanatory_label='Covid-Positive',
-    response_label='No_Taste/Smell',
-    p=0.8)
-omega_1.add_correlated_symptom_with(
-    explanatory_label='Covid-Positive',
-    response_label='Pneumonia',
-    p=0.5)
+omega_2 = Space(N=100000, add_treatment=False, seed=1)
+omega_2.assign_corr_death()
+omega_2.add_correlated_symptom_with(
+    explanatory_label='Vaccine1',
+    response_label='Blood-Clots',
+    p=0.3)
+omega_2.add_correlated_symptom_with(
+    explanatory_label='Vaccine2',
+    response_label='Headache',
+    p=0.6)
+omega_2.add_correlated_symptom_with(
+    explanatory_label='Vaccine3',
+    response_label='Fever',
+    p=0.7)
 
-syn_neg_corr, syn_pos_corr = methodology1(data=omega_1.space)
+syn_neg_corr, syn_pos_corr = methodology1(data=omega_2.space)
 
 methodology2(
-    data=omega_1.space,
-    explanatories=syn_pos_corr[-10:-1].keys(),
+    data=omega_2.space,
+    explanatories=syn_neg_corr[:9].keys(),
     responses=['Death']
 )
 
-syn_df_balanced = balance_data(data=omega_1.space)
+syn_df_balanced = balance_data(data=omega_2.space)
 
 syn_model = methodology3(
     X=syn_df_balanced.drop(['Death'], axis=1),
@@ -45,7 +49,7 @@ syn_best_model = LogisticRegression(
     solver='saga',
     random_state=1,
     n_jobs=-1,
-    C=0.1,
+    C=0.75,
     max_iter=10
 )
 
@@ -65,7 +69,7 @@ real_neg_corr, real_pos_corr = methodology1(data=observation_features)
 
 methodology2(
     data=observation_features,
-    explanatories=real_pos_corr[-10:-1].keys(),
+    explanatories=real_neg_corr[:9].keys(),
     responses=['Death']
 )
 
