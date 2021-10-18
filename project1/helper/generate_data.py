@@ -8,6 +8,7 @@ class Space:
 
     @staticmethod
     def init_random_space(N, add_treatment):
+        """Assign independent distributed values among features."""
         _feature_covid_recovered = \
             np.random.binomial(1, 0.03, N)[:, np.newaxis]
         _feature_covid_positive = \
