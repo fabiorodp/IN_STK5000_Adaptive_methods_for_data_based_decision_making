@@ -50,11 +50,12 @@ def import_data():
             treatment_outcome)
 
 
-def plot_heatmap_corr(df, labels, _show=False):
+def plot_heatmap_corr(df, labels, _show=False, annot=False):
+    """Show a correlation matrix."""
     heatmap(
         df.corr(),
-        annot=True,
-        yticklabels=labels,
+        annot=annot,
+        # yticklabels=labels,
         linewidths=.5,
     ).set_xticklabels(
         labels,
@@ -65,6 +66,7 @@ def plot_heatmap_corr(df, labels, _show=False):
 
 
 def age_analysis(df, plot_box=False, plot_dist=False):
+    """Return a age analysis."""
     # How many of death per age?
     df[10].plot.box()
     show() if plot_box is True else None

@@ -94,6 +94,7 @@ class Space:
 
     @staticmethod
     def defined_cond_probs_with_death(is_treatment_included=False):
+        """Pre-define conditional probabilities for death."""
         ages_ = np.array([20, 40, 60, 80, 100])
         diabetes_ = np.array([0, 1])
         hypertension_ = np.array([0, 1])

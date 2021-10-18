@@ -30,7 +30,7 @@ def methodology2(data: pd.DataFrame, explanatories, responses: list):
 
 def methodology3(X: pd.DataFrame, Y: pd.DataFrame,
                  max_iter: int, cv: int, seed=1, n_jobs=-1,
-                 model_type='LR'):
+                 model_type='LR', score_type='accuracy'):
     """Function creating a pipeline with a Logistic Regression model
     to estimate a parameter."""
     pipeline, param_dist = '', ''
@@ -71,7 +71,7 @@ def methodology3(X: pd.DataFrame, Y: pd.DataFrame,
         estimator=pipeline,
         param_distributions=param_dist,
         n_iter=max_iter,
-        scoring='accuracy',
+        scoring=score_type,
         refit=True,
         cv=cv,
         random_state=seed

@@ -10,6 +10,7 @@ except:
 from sklearn.linear_model import LogisticRegression
 from yellowbrick.model_selection import feature_importances
 import pandas as pd
+from sklearn.utils import resample
 
 # ################################################## Synthetic data
 omega_3 = Space(N=100000, add_treatment=True)
@@ -75,15 +76,34 @@ methodology2(
     responses=['Death']
 )
 
-real_df_balanced = balance_data(data=treatment_base)
-# Not enough data for prediction...
+# Not enough data for predictions because we have only 8 individuals
+# who died...
 # Solutions:
 # ## sklearn.resample
 # ## train without balance and assign weighs and f1-score
 
+real_df_dead = resample(
+    treatment_base[treatment_base['Death'] == 1],
+    replace=True,
+    n_samples=300,
+    random_state=1,
+)
+
+real_df_not_dead = resample(
+    treatment_base[treatment_base['Death'] == 0],
+    replace=False,
+    n_samples=300,
+    random_state=1,
+)
+
+real_df_bootstraped = pd.concat(
+    [real_df_dead, real_df_not_dead],
+    axis=0
+)
+
 real_model = methodology3(
-    X=real_df_balanced.drop(['Death'], axis=1),
-    Y=real_df_balanced['Death'],
+    X=real_df_bootstraped.drop(['Death'], axis=1),
+    Y=real_df_bootstraped['Death'],
     max_iter=20,
     cv=10,
     seed=1,
@@ -101,7 +121,7 @@ real_best_model = LogisticRegression(
 
 real_feature_importances_results = feature_importances(
     real_best_model,
-    real_df_balanced.drop(['Death'], axis=1),
-    treatment_outcome['Death']
+    real_df_bootstraped.drop(['Death'], axis=1),
+    real_df_bootstraped['Death']
 )
 # ##################################################
