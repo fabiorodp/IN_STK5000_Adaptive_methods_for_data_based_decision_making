@@ -125,7 +125,7 @@ methodology2(
 
 kfold = KFold(n_splits=10, shuffle=True)
 inputs = treatment_base_after.iloc[:, 10:]
-targets = treatment_base_after.iloc[:, 2:10]
+targets = treatment_base_after.iloc[:, 2:9]
 history, scores = [], []
 for train, test in kfold.split(inputs, targets):
     model = mlp(
@@ -144,7 +144,7 @@ for train, test in kfold.split(inputs, targets):
     history.append(model.fit(
         inputs.iloc[train, :],
         targets.iloc[train, :],
-        batch_size=32,
+        # batch_size=32,
         epochs=10,
         verbose=1
     ))
