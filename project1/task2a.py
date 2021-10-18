@@ -114,8 +114,8 @@ real_best_model = LogisticRegression(
     solver='saga',
     random_state=1,
     n_jobs=-1,
-    C=0.75,
-    max_iter=10,
+    C=1,
+    max_iter=5,
     penalty="l2"
 )
 
