@@ -101,7 +101,7 @@ treatment_base_before = pd.concat(
 )
 
 treatment_base_after = pd.concat(
-    [treatment_outcome, treatment_features.iloc[:, 11:], treatment_action],
+    [treatment_outcome, treatment_features.iloc[:, 10:], treatment_action],
     axis=1
 )
 

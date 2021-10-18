@@ -64,9 +64,9 @@ observation_features, treatment_features, \
     treatment_action, treatment_outcome = import_data()
 
 treatment_base = pd.concat(
-    [treatment_outcome, treatment_features.iloc[:, 11:], treatment_action],
+    [treatment_outcome, treatment_features.iloc[:, 10:], treatment_action],
     axis=1
-)
+)  # 10
 
 real_neg_corr, real_pos_corr = methodology1(data=treatment_base)
 
