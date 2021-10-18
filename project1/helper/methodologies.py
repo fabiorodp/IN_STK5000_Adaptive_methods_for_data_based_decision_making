@@ -6,7 +6,7 @@ import pandas as pd
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.decomposition import PCA
+# from sklearn.decomposition import PCA
 from sklearn.pipeline import Pipeline
 
 

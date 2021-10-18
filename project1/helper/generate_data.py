@@ -54,8 +54,8 @@ class Space:
         _feature_treatment2 = np.zeros(N)[:, np.newaxis]
         for idx, e in enumerate(_feature_covid_positive):
             if e == 1:
-                _feature_treatment1[idx] = np.random.binomial(1, 0.10)
-                _feature_treatment2[idx] = np.random.binomial(1, 0.10)
+                _feature_treatment1[idx] = np.random.binomial(1, 0.70)
+                _feature_treatment2[idx] = np.random.binomial(1, 0.50)
 
         features = [
             pd.DataFrame(_feature_covid_recovered,
@@ -92,7 +92,7 @@ class Space:
         return df
 
     @staticmethod
-    def defined_cond_probs_with_death():
+    def defined_cond_probs_with_death(is_treatment_included=False):
         ages_ = np.array([20, 40, 60, 80, 100])
         diabetes_ = np.array([0, 1])
         hypertension_ = np.array([0, 1])
@@ -100,65 +100,125 @@ class Space:
         v1_ = np.array([0, 1])
         v2_ = np.array([0, 1])
         v3_ = np.array([0, 1])
+        t1_ = np.array([0, 1])
+        t2_ = np.array([0, 1])
 
-        cond_probs = np.array(
-            np.meshgrid(ages_, diabetes_, hypertension_, g1g2_, v1_, v2_, v3_)
-        ).T.reshape(-1, 7)
+        if not is_treatment_included:
+            cond_probs = np.array(
+                np.meshgrid(ages_, diabetes_, hypertension_, g1g2_, v1_, v2_, v3_)
+            ).T.reshape(-1, 7)
 
-        prob_ages_ = {20: 0.05, 40: 0.15, 60: 0.25, 80: 0.50, 100: 0.70}
-        prob_diabetes_ = {0: 0., 1: 0.30}
-        prob_hypertension_ = {0: 0., 1: 0.30}
-        prob_g1g2_ = {0: 0., 2: 0.90}
-        prob_v1_ = {0: 0., 1: -0.30}
-        prob_v2_ = {0: 0., 1: -0.40}
-        prob_v3_ = {0: 0., 1: -0.50}
+            prob_ages_ = {20: 0.05, 40: 0.15, 60: 0.25, 80: 0.50, 100: 0.70}
+            prob_diabetes_ = {0: 0., 1: 0.30}
+            prob_hypertension_ = {0: 0., 1: 0.30}
+            prob_g1g2_ = {0: 0., 2: 0.90}
+            prob_v1_ = {0: 0., 1: -0.30}
+            prob_v2_ = {0: 0., 1: -0.40}
+            prob_v3_ = {0: 0., 1: -0.50}
 
-        probs = np.zeros((len(cond_probs),))
-        idx_probs = 0
-        for idx_r, r in enumerate(cond_probs):
+            probs = np.zeros((len(cond_probs),))
+            idx_probs = 0
+            for idx_r, r in enumerate(cond_probs):
 
-            p = prob_ages_[cond_probs[idx_r, 0]] + \
-                prob_diabetes_[cond_probs[idx_r, 1]] + \
-                prob_hypertension_[cond_probs[idx_r, 2]] + \
-                prob_g1g2_[cond_probs[idx_r, 3]] + \
-                prob_v1_[cond_probs[idx_r, 4]] + \
-                prob_v2_[cond_probs[idx_r, 5]] + \
-                prob_v3_[cond_probs[idx_r, 6]]
+                p = prob_ages_[cond_probs[idx_r, 0]] + \
+                    prob_diabetes_[cond_probs[idx_r, 1]] + \
+                    prob_hypertension_[cond_probs[idx_r, 2]] + \
+                    prob_g1g2_[cond_probs[idx_r, 3]] + \
+                    prob_v1_[cond_probs[idx_r, 4]] + \
+                    prob_v2_[cond_probs[idx_r, 5]] + \
+                    prob_v3_[cond_probs[idx_r, 6]]
 
-            if p <= 0.01:
-                probs[idx_probs] = 0.01
-            elif p >= 0.9:
-                probs[idx_probs] = 0.9
-            else:
-                probs[idx_probs] = p
-            idx_probs += 1
+                if p <= 0.01:
+                    probs[idx_probs] = 0.01
+                elif p >= 0.9:
+                    probs[idx_probs] = 0.9
+                else:
+                    probs[idx_probs] = p
+                idx_probs += 1
 
-        cond_probs = pd.concat(
-            [
-                pd.DataFrame(
-                    cond_probs,
-                    columns=['Age', 'Diabetes', 'Hypertension',
-                             'G1+G2', 'V1', 'V2', 'V3']
-                ),
-                pd.DataFrame(
-                    probs[:, np.newaxis],
-                    columns=['Probabilities']
-                )
-            ], axis=1)
+            cond_probs = pd.concat(
+                [
+                    pd.DataFrame(
+                        cond_probs,
+                        columns=['Age', 'Diabetes', 'Hypertension',
+                                 'G1+G2', 'V1', 'V2', 'V3']
+                    ),
+                    pd.DataFrame(
+                        probs[:, np.newaxis],
+                        columns=['Probabilities']
+                    )
+                ], axis=1)
 
-        cond_probs_dict = {}
-        for i in range(len(cond_probs)):
-            key = f"{int(cond_probs.iloc[i, :]['Age'])}" + \
-                  f"{int(cond_probs.iloc[i, :]['Diabetes'])}" + \
-                  f"{int(cond_probs.iloc[i, :]['Hypertension'])}" + \
-                  f"{int(cond_probs.iloc[i, :]['G1+G2'])}" + \
-                  f"{int(cond_probs.iloc[i, :]['V1'])}" + \
-                  f"{int(cond_probs.iloc[i, :]['V2'])}" + \
-                  f"{int(cond_probs.iloc[i, :]['V3'])}"
+            cond_probs_dict = {}
+            for i in range(len(cond_probs)):
+                key = f"{int(cond_probs.iloc[i, :]['Age'])}" + \
+                      f"{int(cond_probs.iloc[i, :]['Diabetes'])}" + \
+                      f"{int(cond_probs.iloc[i, :]['Hypertension'])}" + \
+                      f"{int(cond_probs.iloc[i, :]['G1+G2'])}" + \
+                      f"{int(cond_probs.iloc[i, :]['V1'])}" + \
+                      f"{int(cond_probs.iloc[i, :]['V2'])}" + \
+                      f"{int(cond_probs.iloc[i, :]['V3'])}"
 
-            cond_probs_dict[key] = cond_probs.iloc[i, -1]
+                cond_probs_dict[key] = cond_probs.iloc[i, -1]
 
-        return cond_probs, cond_probs_dict
+            return cond_probs, cond_probs_dict
+
+        else:
+            cond_probs = np.array(
+                np.meshgrid(ages_, diabetes_, hypertension_, g1g2_, t1_, t2_)
+            ).T.reshape(-1, 6)
+
+            prob_ages_ = {20: 0.05, 40: 0.15, 60: 0.25, 80: 0.50, 100: 0.70}
+            prob_diabetes_ = {0: 0., 1: 0.30}
+            prob_hypertension_ = {0: 0., 1: 0.30}
+            prob_g1g2_ = {0: 0., 2: 0.90}
+            prob_t1_ = {0: 0., 1: -2.00}
+            prob_t2_ = {0: 0., 1: -1.50}
+
+            probs = np.zeros((len(cond_probs),))
+            idx_probs = 0
+            for idx_r, r in enumerate(cond_probs):
+
+                p = prob_ages_[cond_probs[idx_r, 0]] + \
+                    prob_diabetes_[cond_probs[idx_r, 1]] + \
+                    prob_hypertension_[cond_probs[idx_r, 2]] + \
+                    prob_g1g2_[cond_probs[idx_r, 3]] + \
+                    prob_t1_[cond_probs[idx_r, 4]] + \
+                    prob_t2_[cond_probs[idx_r, 5]]
+
+                if p <= 0.01:
+                    probs[idx_probs] = 0.01
+                elif p >= 0.9:
+                    probs[idx_probs] = 0.9
+                else:
+                    probs[idx_probs] = p
+                idx_probs += 1
+
+            cond_probs = pd.concat(
+                [
+                    pd.DataFrame(
+                        cond_probs,
+                        columns=['Age', 'Diabetes', 'Hypertension',
+                                 'G1+G2', 'T1', 'T2']
+                    ),
+                    pd.DataFrame(
+                        probs[:, np.newaxis],
+                        columns=['Probabilities']
+                    )
+                ], axis=1)
+
+            cond_probs_dict = {}
+            for i in range(len(cond_probs)):
+                key = f"{int(cond_probs.iloc[i, :]['Age'])}" + \
+                      f"{int(cond_probs.iloc[i, :]['Diabetes'])}" + \
+                      f"{int(cond_probs.iloc[i, :]['Hypertension'])}" + \
+                      f"{int(cond_probs.iloc[i, :]['G1+G2'])}" + \
+                      f"{int(cond_probs.iloc[i, :]['T1'])}" + \
+                      f"{int(cond_probs.iloc[i, :]['T2'])}"
+
+                cond_probs_dict[key] = cond_probs.iloc[i, -1]
+
+            return cond_probs, cond_probs_dict
 
     @staticmethod
     def help_age(given_age):
@@ -186,28 +246,50 @@ class Space:
         self.add_treatment = add_treatment
         self.space = self.init_random_space(self.N, self.add_treatment)
         self.cond_probs_with_death, self.cond_probs_with_death_dict = \
-            self.defined_cond_probs_with_death()
+            self.defined_cond_probs_with_death(
+                is_treatment_included=self.add_treatment)
         self.space_corr_mtx = self.space.corr()
 
     def assign_corr_death(self):
-        cond_probs_dict = self.cond_probs_with_death_dict
-        new_death = []
-        for i in range(len(self.space)):
-            if self.space.iloc[i]['Covid-Positive'] == 1:
-                find = f"{int(self.help_age(given_age=self.space.iloc[i]['Age']))}" + \
-                       f"{int(self.space.iloc[i]['Diabetes'])}" + \
-                       f"{int(self.space.iloc[i]['Hypertension'])}" + \
-                       f"{int(self.help_gene(given_gene=self.space.iloc[i]['g1']+ self.space.iloc[i]['g2']))}" + \
-                       f"{int(self.space.iloc[i]['Vaccine1'])}" + \
-                       f"{int(self.space.iloc[i]['Vaccine2'])}" + \
-                       f"{int(self.space.iloc[i]['Vaccine3'])}"
-                new_death.append(np.random.binomial(1, cond_probs_dict[find]))
+        if not self.add_treatment:
+            cond_probs_dict = self.cond_probs_with_death_dict
+            new_death = []
+            for i in range(len(self.space)):
+                if self.space.iloc[i]['Covid-Positive'] == 1:
+                    find = f"{int(self.help_age(given_age=self.space.iloc[i]['Age']))}" + \
+                           f"{int(self.space.iloc[i]['Diabetes'])}" + \
+                           f"{int(self.space.iloc[i]['Hypertension'])}" + \
+                           f"{int(self.help_gene(given_gene=self.space.iloc[i]['g1']+ self.space.iloc[i]['g2']))}" + \
+                           f"{int(self.space.iloc[i]['Vaccine1'])}" + \
+                           f"{int(self.space.iloc[i]['Vaccine2'])}" + \
+                           f"{int(self.space.iloc[i]['Vaccine3'])}"
+                    new_death.append(np.random.binomial(1, cond_probs_dict[find]))
 
-            else:
-                new_death.append(np.random.binomial(1, 0.05))
+                else:
+                    new_death.append(np.random.binomial(1, 0.05))
 
-        self.space['Death'] = new_death
-        self.space_corr_mtx = self.space.corr()
+            self.space['Death'] = new_death
+            self.space_corr_mtx = self.space.corr()
+
+        else:
+            cond_probs_dict = self.cond_probs_with_death_dict
+            new_death = []
+            for i in range(len(self.space)):
+                if self.space.iloc[i]['Covid-Positive'] == 1:
+                    find = f"{int(self.help_age(given_age=self.space.iloc[i]['Age']))}" + \
+                           f"{int(self.space.iloc[i]['Diabetes'])}" + \
+                           f"{int(self.space.iloc[i]['Hypertension'])}" + \
+                           f"{int(self.help_gene(given_gene=self.space.iloc[i]['g1'] + self.space.iloc[i]['g2']))}" + \
+                           f"{int(self.space.iloc[i]['Treatment1'])}" + \
+                           f"{int(self.space.iloc[i]['Treatment2'])}"
+                    new_death.append(
+                        np.random.binomial(1, cond_probs_dict[find]))
+
+                else:
+                    new_death.append(np.random.binomial(1, 0.05))
+
+            self.space['Death'] = new_death
+            self.space_corr_mtx = self.space.corr()
 
     def add_correlated_symptom_with(
             self,

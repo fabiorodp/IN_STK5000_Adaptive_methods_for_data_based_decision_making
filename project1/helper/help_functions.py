@@ -43,7 +43,7 @@ def import_data():
 
     observation_features.columns = labels
     treatment_features.columns = labels
-    treatment_action.columns = ['Treatment 1', 'Treatment 2']
+    treatment_action.columns = ['Treatment1', 'Treatment2']
     treatment_outcome.columns = labels[0:10]
 
     return (observation_features, treatment_features, treatment_action,

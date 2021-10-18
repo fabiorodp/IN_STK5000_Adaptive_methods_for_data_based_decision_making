@@ -9,13 +9,11 @@ except:
 
 from sklearn.linear_model import LogisticRegression
 from yellowbrick.model_selection import feature_importances
+import pandas as pd
 
 # ################################################## Synthetic data
 omega_3 = Space(N=100000, add_treatment=True)
-omega_3.add_correlated_symptom_with(
-    explanatory_label='Treatment1',
-    response_label='Death',
-    p=0.1)
+omega_3.assign_corr_death()
 omega_3.add_correlated_symptom_with(
     explanatory_label='Treatment1',
     response_label='Headache',
@@ -27,4 +25,83 @@ omega_3.add_correlated_symptom_with(
 
 syn_neg_corr, syn_pos_corr = methodology1(data=omega_3.space)
 
+methodology2(
+    data=omega_3.space,
+    explanatories=syn_neg_corr[:5].keys(),
+    responses=['Death']
+)
+
+syn_df_balanced = balance_data(data=omega_3.space)
+
+syn_model = methodology3(
+    X=syn_df_balanced.drop(['Death'], axis=1),
+    Y=syn_df_balanced['Death'],
+    max_iter=20,
+    cv=10,
+    seed=1,
+    n_jobs=-1
+)
+
+syn_best_model = LogisticRegression(
+    solver='saga',
+    random_state=1,
+    n_jobs=-1,
+    C=0.75,
+    max_iter=10
+)
+
+syn_feature_importances_results = feature_importances(
+    estimator=syn_best_model,
+    X=syn_df_balanced.drop(['Death'], axis=1),
+    y=syn_df_balanced['Death'],
+    relative=False,
+)
+# ##################################################
+
+# ################################################## Real data
+observation_features, treatment_features, \
+    treatment_action, treatment_outcome = import_data()
+
+treatment_base = pd.concat(
+    [treatment_outcome, treatment_features.iloc[:, 11:], treatment_action],
+    axis=1
+)
+
+real_neg_corr, real_pos_corr = methodology1(data=treatment_base)
+
+methodology2(
+    data=treatment_base,
+    explanatories=real_neg_corr[:20].keys(),
+    responses=['Death']
+)
+
+real_df_balanced = balance_data(data=treatment_base)
+# Not enough data for prediction...
+# Solutions:
+# ## sklearn.resample
+# ## train without balance and assign weighs and f1-score
+
+real_model = methodology3(
+    X=real_df_balanced.drop(['Death'], axis=1),
+    Y=real_df_balanced['Death'],
+    max_iter=20,
+    cv=10,
+    seed=1,
+    n_jobs=-1
+)
+
+real_best_model = LogisticRegression(
+    solver='saga',
+    random_state=1,
+    n_jobs=-1,
+    C=0.75,
+    max_iter=10,
+    penalty="l2"
+)
+
+real_feature_importances_results = feature_importances(
+    real_best_model,
+    real_df_balanced.drop(['Death'], axis=1),
+    treatment_outcome['Death']
+)
 # ##################################################
