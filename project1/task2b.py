@@ -123,6 +123,7 @@ methodology2(
                'Stomach', 'Myocarditis', 'Blood-Clots']
 )
 
+"""
 kfold = KFold(n_splits=10, shuffle=True)
 inputs = treatment_base_after.iloc[:, 10:]
 targets = treatment_base_after.iloc[:, 2:9]
@@ -156,3 +157,4 @@ for train, test in kfold.split(inputs, targets):
             verbose=0
         )
     )
+"""

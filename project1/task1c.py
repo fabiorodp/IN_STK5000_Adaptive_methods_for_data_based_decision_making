@@ -26,45 +26,28 @@ omega_2.add_correlated_symptom_with(
     response_label='Fever',
     p=0.7)
 
-syn_save_most_corr_sympt = []
-syn_save_best_model = []
-symptms_labels = ['No_Taste/Smell', 'Fever', 'Headache', 'Pneumonia',
-                  'Stomach', 'Myocarditis', 'Blood-Clots']
+syn_neg_corr, syn_pos_corr = methodology1(data=omega_2.space)
 
-for v in ['Vaccine1', 'Vaccine2', 'Vaccine3']:
-    syn_neg_corr, syn_pos_corr = methodology1(data=omega_2.space, parameter=v)
-    syn_save_most_corr_sympt.append(syn_pos_corr.keys()[-2])
-
-    methodology2(
-        data=omega_2.space,
-        explanatories=[v],
-        responses=[syn_pos_corr.keys()[-2]]
-    )
-
-    syn_model = methodology3(
-        X=omega_2.space.drop(symptms_labels, axis=1),
-        Y=omega_2.space[symptms_labels],
-        max_iter=20,
-        cv=10,
-        seed=1,
-        n_jobs=-1
-    )
-
-    syn_save_best_model.append(syn_model)
-
-syn_best_model_v1 = LogisticRegression(
-    solver='saga',
-    random_state=1,
-    n_jobs=-1,
-    C=0.75,
-    max_iter=10
+methodology2(
+    data=omega_2.space,
+    explanatories=['Vaccine1', 'Vaccine2'],
+    responses=['No_Taste/Smell', 'Fever', 'Headache', 'Pneumonia',
+               'Stomach', 'Myocarditis', 'Blood-Clots']
 )
 
-syn_feature_importances_results_v1 = feature_importances(
-    estimator=syn_best_model_v1,
-    X=syn_df_balanced.drop(['Death'], axis=1),
-    y=syn_df_balanced['Death'],
-    relative=False,
+# ##################################################
+
+# ################################################## Real data
+observation_features, treatment_features, \
+    treatment_action, treatment_outcome = import_data()
+
+real_neg_corr, real_pos_corr = methodology1(data=observation_features)
+
+methodology2(
+    data=observation_features,
+    explanatories=['Vaccine1', 'Vaccine2'],
+    responses=['No_Taste/Smell', 'Fever', 'Headache', 'Pneumonia',
+               'Stomach', 'Myocarditis', 'Blood-Clots']
 )
 
-
+# ##################################################
