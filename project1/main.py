@@ -11,7 +11,7 @@ except:
     from project1.task2a import task2a
     from project1.task2b import task2b
 
-res = input('Which task do you want to perform? (1a, 1b, 1c, 2a, 2b')
+res = input('Which task do you want to perform? (1a, 1b, 1c, 2a, 2b)')
 
 if res == '1a':
     task1a()
