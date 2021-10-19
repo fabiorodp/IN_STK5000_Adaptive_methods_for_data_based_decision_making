@@ -7,6 +7,9 @@ Nicholas Walker : walker@nr.no
 
 Aurora Poggi: aurorapo@uio.no
 
+## **Reproducibility:**
+To run the program, use the command `python3 main.py` and follow the questions in your terminal.
+
 
 ## **Data source:**
 [observation_features.csv.gz](https://raw.githubusercontent.com/fabiorodp/IN_STK5000_Adaptive_methods_for_data_based_decision_making/main/project1/data/observation_features.csv.gz)
