@@ -13,8 +13,8 @@ from sklearn.pipeline import Pipeline
 def methodology1(data: pd.DataFrame, parameter='Death'):
     """Function to calculate the correlations among features."""
     df = data.corr()
-    neg_corr = df[parameter].sort_values().head(20)
-    pos_corr = df[parameter].sort_values().tail(20)
+    neg_corr = df[parameter].sort_values().head(15)
+    pos_corr = df[parameter].sort_values().tail(15)
     return neg_corr, pos_corr
 
 
@@ -39,7 +39,8 @@ def methodology3(X: pd.DataFrame, Y: pd.DataFrame,
             ('lr', LogisticRegression(
                 solver='saga',
                 random_state=seed,
-                n_jobs=n_jobs
+                n_jobs=n_jobs,
+                verbose=False
             ))
         ]
 
@@ -55,7 +56,8 @@ def methodology3(X: pd.DataFrame, Y: pd.DataFrame,
         steps = [
             ('rf', RandomForestClassifier(
                 random_state=seed,
-                n_jobs=n_jobs
+                n_jobs=n_jobs,
+                verbose=False
             ))
         ]
 
@@ -77,4 +79,5 @@ def methodology3(X: pd.DataFrame, Y: pd.DataFrame,
         random_state=seed
     )
     search.fit(X, Y)
+    print(f'Best Cross-Validated mean score: {search.best_score_}')
     return search
