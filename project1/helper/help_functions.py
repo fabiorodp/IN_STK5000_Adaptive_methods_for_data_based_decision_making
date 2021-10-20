@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 from pandas import read_csv
-from seaborn import heatmap
 import seaborn as sns
 import numpy as np
 import pandas as pd
@@ -52,19 +51,17 @@ def import_data():
             treatment_outcome)
 
 
-def plot_heatmap_corr(df, labels, _show=False, annot=False):
+def plot_heatmap_corr(features, title):
     """Show a correlation matrix."""
-    heatmap(
-        df.corr(),
-        annot=annot,
-        # yticklabels=labels,
-        linewidths=.5,
-    ).set_xticklabels(
-        labels,
-        rotation=90,
-    )
-    # sns.set(font_scale=0.7)
-    plt.show() if _show is True else None
+    sns.heatmap(
+        features.corr(),
+        linewidths=0.1,
+        annot=True,
+        annot_kws={"fontsize": 8},
+        fmt='.2f'
+    ).figure.subplots_adjust(left=0.2, bottom=0.3)
+    plt.title(title)
+    plt.show()
 
 
 def age_analysis(df, plot_box=False, plot_dist=False):
@@ -90,11 +87,9 @@ def age_analysis(df, plot_box=False, plot_dist=False):
 def balance_data(data, param='Death'):
     """Balancing targets."""
     df_dead = data[data[param] == 1.0]
-    df_not_dead = data[data[param] == 0.0].iloc[
-                  :df_dead.shape[0], :]
+    df_not_dead = data[data[param] == 0.0].iloc[:df_dead.shape[0], :]
     df_balanced = pd.concat([df_dead, df_not_dead])
-    df_balanced = df_balanced[df_balanced['Covid-Positive'] == 1].drop(
-        ['Covid-Positive'], axis=1)
+    df_balanced = df_balanced[df_balanced['Covid-Positive'] == 1].drop(['Covid-Positive'], axis=1)
     return df_balanced
 
 
@@ -105,13 +100,15 @@ def feature_importance_methodology1(syn_neg_corr, syn_pos_corr):
         x=pd.concat([syn_neg_corr, syn_pos_corr], axis=0)[:-1].index,
     ).figure.subplots_adjust(left=0.15, bottom=0.3)
     plt.xticks(rotation=90)
-    plt.title("Top 15 negative and positive correlations with 'Death'")
+    plt.title("Top negative and positive correlations with 'Death'")
     plt.ylabel('Correlation scores')
     plt.show()
     print('done.')
 
 
-def feature_importance_methodology3(best_model, topn=15):
+def feature_importance_methodology3(best_model, topn=5,
+                                    return_top_positive=False,
+                                    return_top_negative=False):
     arg_sorted = np.argsort(best_model.coef_.ravel())
 
     top_pos_vals = best_model.coef_.ravel()[arg_sorted][-topn:]
@@ -122,24 +119,17 @@ def feature_importance_methodology3(best_model, topn=15):
 
     print('Plotting...')
     sns.barplot(
-        x=top_neg_vals,
-        y=top_neg_names,
+        x=np.hstack((top_neg_vals, top_pos_vals)),
+        y=np.hstack((top_neg_names, top_pos_names))
     ).figure.subplots_adjust(left=0.2, bottom=0.2)
     plt.xticks(rotation=90)
     plt.title(
-        "Top 15 negative coefficients from the best Logistic Regression model")
+        f"Top LR model's negative coefficients")
     plt.xlabel('Coefficients')
     plt.show()
     print('done.')
 
-    print('Plotting...')
-    sns.barplot(
-        x=top_pos_vals,
-        y=top_pos_names,
-    ).figure.subplots_adjust(left=0.2, bottom=0.2)
-    plt.xticks(rotation=90)
-    plt.title(
-        "Top 15 positive coefficients from the best Logistic Regression model")
-    plt.xlabel('Coefficients')
-    plt.show()
-    print('done.')
+    if return_top_positive is True:
+        return top_pos_names, top_pos_vals
+    elif return_top_negative is True:
+        return top_neg_names, top_neg_vals
