@@ -175,5 +175,8 @@ def task1a():
         # interval with statistical significance of 5%, which ensure even
         # more that these features are the most important when predicting
         # death.
+
+        # We are 95% confident that the coefficients are between lower
+        # and higher boundaries.
     print('Real data study completed for task 1a.')
     # ##################################################
