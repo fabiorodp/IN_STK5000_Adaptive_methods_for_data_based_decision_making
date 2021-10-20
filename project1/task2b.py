@@ -44,7 +44,6 @@ def task2b():
         )
     print('Synthetic data study completed for task 2b.')
 
-
     # ##################################################
 
     # ################################################## Real data
