@@ -136,6 +136,7 @@ def feature_importance_methodology3(best_model, topn=5,
 
 
 def confidence_interval_plot(lr_model, top):
+    """Boxplot for confidence intervals."""
     ci_ = lr_model.conf_int()
     ci_['Features'] = ci_.index
     ci_['Median'] = [np.median(np.array([ci_.iloc[i, 0], ci_.iloc[i, 1]])) for
