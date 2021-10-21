@@ -54,15 +54,14 @@ def task1a():
             title='Auto-correlation among selected features'
         )
 
-        # getting top negative and positive correlations
-        syn_top5_pos = syn_pos_corr.index[-6:-1].to_list()
-        syn_top5_neg = syn_neg_corr.index[:5].to_list()
+        syn_topp = syn_pos_corr.index[-11:-1].to_list()
+        syn_topn = syn_neg_corr.index[:10].to_list()
 
         # ############################## Methodology 2
         print('Performing methodology 2...')
         methodology2(
-            data=omega_1.space,
-            explanatories=syn_pos_corr[-10:-1].keys(),
+            data=syn_base,
+            explanatories=syn_pos_corr[-6:-1].keys(),
             responses=['Death']
         )
 
@@ -71,8 +70,7 @@ def task1a():
         syn_df_balanced = balance_data(data=omega_1.space)
 
         syn_model = methodology3(
-            X=syn_df_balanced.drop(['Death', 'Income'], axis=1),
-            # X=syn_df_balanced[syn_top5_neg+syn_top5_pos],
+            X=syn_df_balanced[syn_topn+syn_topp],
             Y=syn_df_balanced['Death'],
             max_iter=20,
             cv=500,
@@ -93,8 +91,7 @@ def task1a():
 
         syn_log_reg = sm.Logit(
             syn_df_balanced['Death'],
-            # syn_df_balanced[syn_top5_neg+syn_top5_pos],
-            syn_df_balanced.drop(['Death', 'Income'], axis=1)
+            syn_df_balanced[syn_topn+syn_topp]
         ).fit(maxiter=syn_model.best_estimator_._final_estimator.max_iter)
         print(syn_log_reg.summary())
 
@@ -128,7 +125,7 @@ def task1a():
             title='Auto-correlation among selected features'
         )
 
-        real_base = observation_features[observation_features['Covid-Positive'] == 1].drop(['Covid-Positive'], axis=1)
+        real_base = observation_features[observation_features['Covid-Positive']==1].drop(['Covid-Positive'], axis=1)
         real_neg_corr, real_pos_corr = methodology1(data=real_base)
         feature_importance_methodology1(real_neg_corr, real_pos_corr)
         plot_heatmap_corr(
@@ -136,15 +133,14 @@ def task1a():
             title='Auto-correlation among selected features'
         )
 
-        # getting top negative and positive correlations
-        real_top5_pos = real_pos_corr.index[-6:-1].to_list()
-        real_top5_neg = real_neg_corr.index[:5].to_list()
+        topp = real_pos_corr.index[-11:-1].to_list()
+        topn = real_neg_corr.index[:10].to_list()
 
         # ############################## Methodology 2
         print('Performing methodology 2...')
         methodology2(
-            data=observation_features,
-            explanatories=real_pos_corr[-10:-1].keys(),
+            data=real_base,
+            explanatories=real_pos_corr[-6:-1].keys(),
             responses=['Death']
         )
 
@@ -156,18 +152,18 @@ def task1a():
         )
 
         real_model = methodology3(
-            X=real_df_balanced[real_top5_neg+real_top5_pos],
+            X=real_df_balanced[topn+topp],
             Y=real_df_balanced['Death'],
             max_iter=20,
-            cv=10,
+            cv=500,
             seed=1,
             n_jobs=-1
         )
+        # Best Cross-Validated mean score: 0.8700404858299594
 
         feature_importance_methodology3(
             best_model=real_model.best_estimator_._final_estimator,
-            topn=5,
-            return_top_positive=True
+            topn=5
         )
 
         # The LR have a cross-validated rate of predicting death at 86%,
@@ -177,7 +173,7 @@ def task1a():
 
         real_log_reg = sm.Logit(
             real_df_balanced['Death'],
-            real_df_balanced[real_top5_neg+real_top5_pos]
+            real_df_balanced[topn+topp]
         ).fit(maxiter=real_model.best_estimator_._final_estimator.max_iter)
         print(real_log_reg.summary())
 

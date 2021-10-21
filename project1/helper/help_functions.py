@@ -1,3 +1,4 @@
+from sklearn.utils import resample
 import matplotlib.pyplot as plt
 from pandas import read_csv
 import seaborn as sns
@@ -84,6 +85,10 @@ def age_analysis(df, plot_box=False, plot_dist=False):
     # kind of normal distribution
 
 
+def randomly_balance_data():
+    pass
+
+
 def balance_data(data, param='Death'):
     """Balancing targets."""
     df_dead = data[data[param] == 1.0]
@@ -123,8 +128,7 @@ def feature_importance_methodology3(best_model, topn=5,
         y=np.hstack((top_neg_names, top_pos_names))
     ).figure.subplots_adjust(left=0.2, bottom=0.2)
     plt.xticks(rotation=90)
-    plt.title(
-        f"Top LR model's negative coefficients")
+    plt.title(f"Top LR model's selected coefficients")
     plt.xlabel('Coefficients')
     plt.show()
     print('done.')

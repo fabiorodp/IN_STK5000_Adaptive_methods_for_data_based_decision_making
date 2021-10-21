@@ -1,15 +1,19 @@
 try:
     from .helper.generate_data import Space
-    from .helper.help_functions import balance_data, import_data
+    from .helper.help_functions import balance_data, import_data, plot_heatmap_corr
+    from .helper.help_functions import confidence_interval_plot
     from .helper.methodologies import methodology1, methodology2, methodology3
     from .helper.help_functions import feature_importance_methodology3
     from .helper.help_functions import feature_importance_methodology1
 except:
     from project1.helper.generate_data import Space
     from project1.helper.methodologies import methodology1, methodology2, methodology3
-    from project1.helper.help_functions import balance_data, import_data
+    from project1.helper.help_functions import confidence_interval_plot
+    from project1.helper.help_functions import balance_data, import_data, plot_heatmap_corr
     from project1.helper.help_functions import feature_importance_methodology3
     from project1.helper.help_functions import feature_importance_methodology1
+
+import statsmodels.api as sm
 
 
 def task1c():
@@ -31,12 +35,8 @@ def task1c():
         p=0.7)
     print('done.')
 
-    input_ = input("Run methodologies 1 and 2 for synthetic data? (y/n)\n")
+    input_ = input("Run methodologies 2 for synthetic data? (y/n)\n")
     if input_ == 'y':
-        print('Performing methodology 1...')
-        syn_neg_corr, syn_pos_corr = methodology1(data=omega_2.space)
-        feature_importance_methodology1(syn_neg_corr, syn_pos_corr)
-
         print('Performing methodology 2...')
         methodology2(
             data=omega_2.space,
@@ -54,12 +54,8 @@ def task1c():
         treatment_action, treatment_outcome = import_data()
     print('done.')
 
-    input_ = input("Run methodologies 1 and 2 for real data? (y/n)\n")
+    input_ = input("Run methodologies 2 for real data? (y/n)\n")
     if input_ == 'y':
-        print('Performing methodology 1...')
-        real_neg_corr, real_pos_corr = methodology1(data=observation_features)
-        feature_importance_methodology1(real_neg_corr, real_pos_corr)
-
         print('Performing methodology 2...')
         methodology2(
             data=observation_features,

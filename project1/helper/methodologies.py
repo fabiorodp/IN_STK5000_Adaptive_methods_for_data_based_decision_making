@@ -2,30 +2,85 @@ try:
     from generate_data import Space
 except:
     from project1.helper.generate_data import Space
-import pandas as pd
+
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 # from sklearn.decomposition import PCA
 from sklearn.pipeline import Pipeline
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
 
 
 def methodology1(data: pd.DataFrame, parameter='Death'):
     """Function to calculate the correlations among features."""
     df = data.corr()
+
     neg_corr = df[parameter].sort_values().head(15)
+    print(df[parameter].sort_values().head(15))
+
     pos_corr = df[parameter].sort_values().tail(15)
+    print(df[parameter].sort_values().tail(15))
     return neg_corr, pos_corr
 
 
 def methodology2(data: pd.DataFrame, explanatories, responses: list):
     """Function to calculate the conditional probability among features."""
+    cond_dict_f_f = {}
+    cond_dict_f_t = {}
+    cond_dict_t_f = {}
+    cond_dict_t_t = {}
     for r in responses:
-        for v in explanatories:
-            _prob = data.groupby([r]).size().div(len(data))
-            conditional_prob = data.groupby([r, v]).size().div(len(data)).div(
-                _prob, axis=0, level=r)
-            print(f"P({r} | {v}) = {conditional_prob} \n")
+        for e in explanatories:
+            cond_dict_f_f[f'{r}|{e}'] = []
+            cond_dict_f_t[f'{r}|{e}'] = []
+            cond_dict_t_f[f'{r}|{e}'] = []
+            cond_dict_t_t[f'{r}|{e}'] = []
+
+    for i in range(10):
+        sample_data = data.sample(frac=0.25, replace=True)
+        for r in responses:
+            for e in explanatories:
+                _prob_explanatory = sample_data.groupby([e]).size().div(
+                    len(sample_data))  # P(explanatory)
+                _prob_response_explanatory = sample_data.groupby(
+                    [r, e]).size().div(
+                    len(sample_data))  # P(response, explanatory)
+                _cprob = _prob_response_explanatory.div(_prob_explanatory,
+                                                        axis=0)
+
+                cond_dict_f_f[f'{r}|{e}'].append(_cprob.iloc[0])
+                print(f'P(not {r}| not {e}) = {_cprob.iloc[0]}')
+
+                cond_dict_f_t[f'{r}|{e}'].append(_cprob.iloc[1])
+                print(f'P(not {r}| {e})  {_cprob.iloc[1]}')
+
+                try:
+                    cond_dict_t_f[f'{r}|{e}'].append(_cprob.iloc[2])
+                    print(f'P({r}| not {e}) = {_cprob.iloc[2]}')
+                except:
+                    cond_dict_t_f[f'{r}|{e}'].append(0)
+                    print(f'P({r}| not {e}) = {0}')
+
+                try:
+                    cond_dict_t_t[f'{r}|{e}'].append(_cprob.iloc[3])
+                    print(f'P({r}|{e}) = {_cprob.iloc[3]}')
+                except:
+                    cond_dict_t_t[f'{r}|{e}'].append(0)
+                    print(f'P({r}|{e}) = {0}')
+
+    conds = [cond_dict_f_f, cond_dict_f_t, cond_dict_t_f, cond_dict_t_t]
+    labels = ['False|False', 'False|True', 'True|False', 'True, True']
+
+    for a, b in zip(conds, labels):
+        sns.boxplot(
+            data=pd.DataFrame(a),
+            orient='h'
+        ).figure.subplots_adjust(left=0.35, bottom=0.15)
+        plt.title(f'Conditional Probabilities {b}')
+        plt.xlabel("P")
+        plt.show()
 
 
 def methodology3(X: pd.DataFrame, Y: pd.DataFrame,
