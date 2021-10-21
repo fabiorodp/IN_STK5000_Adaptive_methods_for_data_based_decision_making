@@ -77,6 +77,7 @@ def task1a():
             seed=1,
             n_jobs=-1
         )
+        # Best Cross-Validated mean score: 0.8213894736842104
 
         feature_importance_methodology3(
             best_model=syn_model.best_estimator_._final_estimator,
@@ -95,10 +96,10 @@ def task1a():
         ).fit(maxiter=syn_model.best_estimator_._final_estimator.max_iter)
         print(syn_log_reg.summary())
 
-        # All coefficients of the selected features are inside the confidence
-        # interval with statistical significance of 5%, which ensure even
-        # more that these features are the most important when predicting
-        # death.
+        # For this LR model submitted to a 500 test CV folds, with 82% in
+        # predicting death, we are 95% confident that the explanatory
+        # coefficients are in their Confidence interval respectively,
+        # with a statistical significance level of 5%.
 
     print('Synthetic data study completed for task 1a.')
 
