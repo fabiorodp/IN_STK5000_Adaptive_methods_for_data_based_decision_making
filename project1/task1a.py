@@ -69,10 +69,11 @@ def task1a():
         syn_df_balanced = balance_data(data=omega_1.space)
 
         syn_model = methodology3(
-            X=syn_df_balanced[syn_top5_neg+syn_top5_pos],
+            X=syn_df_balanced.drop(['Death', 'Income'], axis=1),
+            # X=syn_df_balanced[syn_top5_neg+syn_top5_pos],
             Y=syn_df_balanced['Death'],
             max_iter=20,
-            cv=10,
+            cv=500,
             seed=1,
             n_jobs=-1
         )
@@ -89,7 +90,8 @@ def task1a():
 
         syn_log_reg = sm.Logit(
             syn_df_balanced['Death'],
-            syn_df_balanced[syn_top5_neg+syn_top5_pos]
+            # syn_df_balanced[syn_top5_neg+syn_top5_pos],
+            syn_df_balanced.drop(['Death', 'Income'], axis=1)
         ).fit(maxiter=syn_model.best_estimator_._final_estimator.max_iter)
         print(syn_log_reg.summary())
 
