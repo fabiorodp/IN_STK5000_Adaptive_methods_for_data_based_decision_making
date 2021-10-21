@@ -133,3 +133,23 @@ def feature_importance_methodology3(best_model, topn=5,
         return top_pos_names, top_pos_vals
     elif return_top_negative is True:
         return top_neg_names, top_neg_vals
+
+
+def confidence_interval_plot(lr_model, top):
+    ci_ = lr_model.conf_int()
+    ci_['Features'] = ci_.index
+    ci_['Median'] = [np.median(np.array([ci_.iloc[i, 0], ci_.iloc[i, 1]])) for
+                     i in range(len(ci_))]
+    ci_ = ci_.sort_values(by='Median')
+    ci_topn = ci_.iloc[:top, :]
+    ci_topp = ci_.iloc[-top:, :]
+    ci_concat = pd.concat([ci_topn, ci_topp], axis=0).T
+
+    sns.boxplot(
+        data=ci_concat.iloc[:2, :],
+        orient='h'
+    ).figure.subplots_adjust(left=0.22, bottom=0.15)
+    plt.title(
+        "95% confidence interval for top selected explanatory coefficients")
+    plt.xlabel("Coefficients' confidence interval")
+    plt.show()

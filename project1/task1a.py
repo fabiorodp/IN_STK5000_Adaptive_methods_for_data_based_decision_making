@@ -1,12 +1,17 @@
+import numpy as np
+import pandas as pd
+
 try:
     from .helper.generate_data import Space
     from .helper.help_functions import balance_data, import_data, plot_heatmap_corr
+    from .helper.help_functions import confidence_interval_plot
     from .helper.methodologies import methodology1, methodology2, methodology3
     from .helper.help_functions import feature_importance_methodology3
     from .helper.help_functions import feature_importance_methodology1
 except:
     from project1.helper.generate_data import Space
     from project1.helper.methodologies import methodology1, methodology2, methodology3
+    from project1.helper.help_functions import confidence_interval_plot
     from project1.helper.help_functions import balance_data, import_data, plot_heatmap_corr
     from project1.helper.help_functions import feature_importance_methodology3
     from project1.helper.help_functions import feature_importance_methodology1
@@ -96,6 +101,11 @@ def task1a():
         ).fit(maxiter=syn_model.best_estimator_._final_estimator.max_iter)
         print(syn_log_reg.summary())
 
+        confidence_interval_plot(
+            lr_model=syn_log_reg,
+            top=5
+        )
+
         # For this LR model submitted to a 500 test CV folds, with 82% in
         # predicting death, we are 95% confident that the explanatory
         # coefficients are in their Confidence interval respectively,
@@ -174,6 +184,11 @@ def task1a():
         ).fit(maxiter=real_model.best_estimator_._final_estimator.max_iter)
         print(real_log_reg.summary())
 
+        confidence_interval_plot(
+            lr_model=real_log_reg,
+            top=5
+        )
+
         # All coefficients of the selected features are inside the confidence
         # interval with statistical significance of 5%, which ensure even
         # more that these features are the most important when predicting
@@ -181,5 +196,6 @@ def task1a():
 
         # We are 95% confident that the coefficients are between lower
         # and higher boundaries.
+
     print('Real data study completed for task 1a.')
     # ##################################################
