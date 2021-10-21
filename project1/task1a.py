@@ -1,6 +1,3 @@
-import numpy as np
-import pandas as pd
-
 try:
     from .helper.generate_data import Space
     from .helper.help_functions import balance_data, import_data, plot_heatmap_corr
