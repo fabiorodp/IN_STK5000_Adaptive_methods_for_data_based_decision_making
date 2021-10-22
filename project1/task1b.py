@@ -120,7 +120,7 @@ def task1b():
         print('Performing methodology 2...')
         methodology2(
             data=observation_features,
-            explanatories=real_neg_corr[:5].keys(),
+            explanatories=real_neg_corr[:10].keys(),
             responses=['Death']
         )
         print('done.')

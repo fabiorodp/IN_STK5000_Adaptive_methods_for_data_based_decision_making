@@ -13,8 +13,6 @@ except:
     from project1.helper.help_functions import feature_importance_methodology3
     from project1.helper.help_functions import feature_importance_methodology1
 
-import statsmodels.api as sm
-
 
 def task1c():
     # ################################################## Synthetic data

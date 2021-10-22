@@ -140,7 +140,7 @@ def task1a():
         print('Performing methodology 2...')
         methodology2(
             data=real_base,
-            explanatories=real_pos_corr[-6:-1].keys(),
+            explanatories=real_pos_corr[-10:-1].keys(),
             responses=['Death']
         )
 
