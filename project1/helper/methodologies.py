@@ -38,7 +38,7 @@ def methodology2(data: pd.DataFrame, explanatories, responses: list):
             cond_dict_t_f[f'{r}|{e}'] = []
             cond_dict_t_t[f'{r}|{e}'] = []
 
-    for i in range(10):
+    for i in range(1000):
         sample_data = data.sample(frac=0.25, replace=True)
         for r in responses:
             for e in explanatories:
