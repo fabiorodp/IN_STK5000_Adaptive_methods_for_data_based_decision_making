@@ -38,7 +38,7 @@ def task1c():
         print('Performing methodology 2...')
         methodology2(
             data=omega_2.space,
-            explanatories=['Vaccine1', 'Vaccine2'],
+            explanatories=['Vaccine1', 'Vaccine2', 'Vaccine3'],
             responses=['No_Taste/Smell', 'Fever', 'Headache', 'Pneumonia',
                        'Stomach', 'Myocarditis', 'Blood-Clots']
         )
@@ -57,7 +57,7 @@ def task1c():
         print('Performing methodology 2...')
         methodology2(
             data=observation_features,
-            explanatories=['Vaccine1', 'Vaccine2'],
+            explanatories=['Vaccine1', 'Vaccine2', 'Vaccine3'],
             responses=['No_Taste/Smell', 'Fever', 'Headache', 'Pneumonia',
                        'Stomach', 'Myocarditis', 'Blood-Clots']
         )
