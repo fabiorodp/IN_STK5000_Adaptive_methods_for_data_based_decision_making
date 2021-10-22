@@ -1,0 +1,44 @@
+\section{Introduction}
+\label{sec:introduction}
+
+At the time of writing this paper, Covid-19 is a current and serious threat to humans, which has killed $4.860.014$ out of $224.989.641$ \footnote{http://www.worldometers.info/coronavirus/} infected people around the globe. Given this, researchers have been assigned the duty of using intelligent ways to fight this illness. With access to patient data combined with considerable computing power, analysts and researchers can employ statistics, machine learning, and neural networks to find vital answers that can save people's lives.
+
+In this paper, we propose and apply an experimental methodology to gain relevant knowledge in the understanding treatments and risk factors with Covid-19 illness. In particular, we investigate the population's age, gender, income, comorbidities, and any specific genome pattern predisposition to develop greater disease severity. Additionally, we analyze the efficacy of vaccination, its side effects, and the effectiveness of treatments to avoid death related to the Covid-19 illness. Finally, we will also discuss privacy issues that may arise with the data set.
+
+In order to establish a \textbf{\textit{ground truth}} and determine that our model is appropriate to the task, we generate synthetic data-bases. This will allow us to understand what information we can reliably extract via our model, i.e., basic feature correlations, probabilities, and descriptive statistics. With these considerations, we will be able to formulate a more precise approach to the following exact tasks:
+
+\label{Tasks and Questions}
+\begin{itemize}
+    \item[1a.] Questions:
+    \begin{itemize}
+        \item[i.] Can we predict death rate given age, gender, income, genes and comorbidities?
+        \item[ii.] Which explanatory features are best to predict death?
+    \label{task1}
+    \end{itemize}
+    
+    \item[1b.] Questions:
+    \begin{itemize}
+        \item[i.] Can we predict death rate (efficacy) of a vaccine?
+        \item[ii.] Which vaccine is most effective?
+    \end{itemize}
+    
+    \item[1c.] Questions:
+    \begin{itemize}
+        \item[i.] Can we predict a specific symptom(s) (side-effect(s)) of a vaccine?
+        \item[ii.] Which side-effect(s) each vaccine produce?
+    \end{itemize}
+    
+    \item[2.] Questions:
+    \begin{itemize}
+        \item[i.] Can we predict death rate given a specific treatment?
+        \item[ii.] Which treatment is the most effective?
+        \item[iii.] Can we predict a precise symptom(s) (side-effect(s)) given a specific treatment?
+        \item[iv.] Which side-effect(s) does each treatment produce?
+    \label{task2}
+    \end{itemize}
+\end{itemize}
+
+To investigate each of these questions, we perform three automated methodologies. Our first methodology is to compute the autocorrelation matrix of the features of the data, in order to establish a high-level understanding of the data. The second approach is to evaluate the conditional probability of an outcome (e.g. $\mathbf{P}(Symptom | Vaccine)$ or $\mathbf{P}(Death | Vaccine)$). The third automated methodology is to model each question with a machine learning model, specifically \emph{Logistic Regression}. To this end we develop a pipeline to train a logistic regression model on the data, starting again with a synthetic data set generated to establish the effectiveness of the model for modelling that question. Finally, we train a logistic regression model with cross-validation which then learns to predict an outcome based on input features.
+
+%We start by performing this calculation on the synthetic data to establish that our process correctly calculates the probability. Next, we calculate the conditional probabilities on the observational and treatment data to determine which features affect the outcomes. We note that this calculation does \emph{not} model joint probability distributions, because the number of features makes it infeasible to model all combinations of them.
+

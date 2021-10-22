@@ -1,0 +1,49 @@
+\section{Synthetic data-sets}
+\label{sec:synthetic_data}
+
+A Python class called \textit{Space} \footnote{https://github.com/fabiorodp/IN\_STK5000\_Adaptive \_methods\_for\_data\_based\_decision\_making/blob/main/project1/ helper/generate\_data.py} is built to make the synthetic data-sets ($\Omega_1, \Omega_2, \Omega_3$). We define the argument $seed=1$ for maintaining consistency of the randomly generated values. For each $\Omega$, there are $N=100,000$ samples generated, denoting each individual. When treatment argument is false, there are 150 features in the data, but when \textit{add\_treatment=True}, 152 features with the following independent distributions:
+\begin{itemize}
+    \item[[ 0]] Covid\_Recovered $\sim Binomial(1, 0.3)$
+    \item[[ 1]] Covid\_Positive $\sim Binomial(1, 0.3)$
+    \item Symptoms $\sim OneHotE(Uniform(1, 8))$
+    \begin{itemize}
+        \item[[ 2]] No-Taste/Smell
+        \item[[ 3]] Fever
+        \item[[ 4]] Headache
+        \item[[ 5]] Pneumonia
+        \item[[ 6]] Stomach
+        \item[[ 7]] Myocarditis
+        \item[[ 8]] Blood-Clots
+    \end{itemize}
+    \item[[ 9]] Death $\sim Binomial(1, 0.1)$
+    \item[[ 10]] Age $\sim Uniform(1, 100)$
+    \item[[ 11]] Gender $\sim Binomial(1, 0.5)$
+    \item[[ 12]] Income $\sim Normal(25000, 10000)$, where people with $age \leq 18$ have no income.
+    \item[[ 13:141]] Genes $\sim Binomial(1, 0.25)$
+    \item[[ 141]] Asthma $\sim Binomial(1, 0.07)$
+    \item[[ 142]] Obesity $\sim Binomial(1, 0.13)$
+    \item[[ 143]] Smoking $\sim Binomial(1, 0.19)$
+    \item[[ 144]] Diabetes $\sim Binomial(1, 0.10)$
+    \item[[ 145]] Heart-disease $\sim Binomial(1, 0.1)$
+    \item[[ 146]] Hypertension $\sim Binomial(1, 0.17)$
+    \item Vaccines $\sim OneHotE(Uniform(1, 4))$
+        \begin{itemize}
+        \item[[ 147]] Vaccine 1
+        \item[[ 148]] Vaccine 2
+        \item[[ 149]] Vaccine 3
+    \end{itemize}
+    \item[[ 150]] Treatment 1 $\sim Binomial(1, 0.7)$
+    \item[[ 151]] Treatment 2 $\sim Binomial(1, 0.5)$
+\end{itemize}
+
+It is essential to state that a \textit{pandas.DataFrame} object called \textit{Space}, inside the class Space, is generated automatically by the constructor of that class.
+
+Next, the Space's class method \textit{assign\_corr\_death()} is called to assign new values for the feature $Death$, from a \textit{Binomial} distribution, based on a pre-defined combination of conditional probabilities between the explanatory variables ($Age$, $Income$, $Diabetes$, $Hypertension$, $Gene_1+Gene_2$, $Vaccine1$, $Vaccine2$, $Vaccine3$, $Treatment1$ and $Treatment2$) with the response variable ($Death$). These probabilities apply only for the cases when $CovidPositive$ is true.
+
+Now we need some other conditional probabilities to differentiate each $\Omega$ used for each specific task of this project. Therefore, in order to answer questions in \ref{task1}a, $\Omega_1$ requires features $No\_Taste/Smell$, and $Pneumonia$ drawn from independent Binomial distributions with the following conditional probabilities: $$\mathbb{P}(No\_Taste/Smell | CovidPositive)=0.8,$$ $$\mathbb{P}(Pneumonia | CovidPositive)=0.5.$$
+
+For the questions in tasks \ref{task1}b and \ref{task1}c, we will use $\Omega_2$ with three other re-generated features $Blood\_Clots$, $Headache$, and $Fever$ which are drawn from independent Binomial distributions with the following conditional probabilities: $$\mathbb{P}(Blood\_Clots| Vaccine 1) = 0.3,$$ $$\mathbb{P}(Headache | Vaccine 2) = 0.6,$$ $$\mathbb{P}(Fever | Vaccine 3) = 0.7.$$
+
+For the questions in task 2, two new features will be introduced, $Treatment 1$ and $Treatment 2$, which can be generated when calling the Space class with argument \textit{add\_treatment = True}. Then, the treatments will be pulled from Binomial distribution with probability equals 70\% and 50\% for each treatment respectively. Note that both treatments can occur for the same individual. After that, we will re-generate values for $Death$ by using the class method \textit{assign\_corr\_death()}, and when calling the class method \textit{add\_correlated\_symptom\_with()}, we will assign new values for the features $Headache$ and $Fever$ from independent Binomial distributions with conditional probabilities as follows: $$\mathbb{P}(Headache | Treatment 1) = 0.5,$$ $$\mathbb{P}(Fever | Treatment 2) = 0.7.$$
+
+After generating synthetic spaces ($\Omega_1; \Omega_2; \Omega_3)$ for each task (\ref{task1}a; \ref{task1}b and c; 2) respectively, with all features properly designed and correlated, we can move forward with our study to understand the ground truth (i.e. effectiveness of our analysis) and estimate parameters on observational and treatment data.

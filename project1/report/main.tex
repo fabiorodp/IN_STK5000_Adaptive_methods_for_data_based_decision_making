@@ -1,0 +1,59 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage{import}
+\usepackage[hyperref]{style}
+\usepackage{times}
+\usepackage{latexsym}
+\renewcommand{\UrlFont}{\ttfamily\small}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{microtype}
+\usepackage{amsmath}	
+\usepackage{amssymb}		 
+% \usepackage{fixltx2e}
+\usepackage{hyperref}
+\aclfinalcopy % Uncomment this line for the final submission
+%\def\aclpaperid{***} %  Enter the acl Paper ID here
+%\setlength\titlebox{5cm}
+% You can expand the titlebox if you need extra space
+% to show all the authors. Please do not make the titlebox
+% smaller than 5cm (the original size);
+
+%\usepackage{algorithm}
+%\usepackage{algpseudocode}
+\usepackage[]{algorithm2e}
+
+\usepackage{indentfirst} % to have space in the first paragraph
+\newcommand\BibTeX{B\textsc{ib}\TeX}
+
+\title{IN-STK5000/9000 - Autumn 2021: Project1}
+
+\author{Fábio Rodrigues Pereira \\
+  \texttt{fabior@uio.no} \\
+  
+  \And
+  Nicholas Walker \\
+  \texttt{walker@nr.no} \\
+  
+  \And
+  Aurora Poggi \\
+  \texttt{aurorapo@uio.no} \\}
+  
+%\date{Autumn 2021}
+
+\begin{document}
+\maketitle
+
+\import{./content}{introduction.tex}
+\import{./content}{reproducibility.tex}
+\import{./content}{baseline.tex}
+\import{./content}{methodologies.tex}
+%\import{./content}{experimenting.tex}
+\import{./content}{ground_truth.tex}
+\import{./content}{results.tex}
+\import{./content}{privacy.tex}
+\import{./content}{conclusion.tex}
+
+\bibliographystyle{bib_style}
+\bibliography{bibliography}
+
+\end{document}

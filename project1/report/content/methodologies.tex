@@ -1,0 +1,30 @@
+\section{Methodologies}
+\label{sec:methodologies}
+
+%Describe correlation matrix (methodology 1) in mathematics
+In \textbf{Methodology$_1$} we compute the autocorrelation matrix, also called series correlation, see \cite{Devore-Berk}, between features to get a first view of the available data and the relationships between them.  To do this we use the autocorrelation matrix that explains the degree of dependence between the values of our features. 
+Given a sequence $x$, the autocorrelation is given by $$R_x_i=Corr(x,x)_i=\sum_{i=0}^{\infty}x_i x_{i+1}.$$
+
+In this project we did not use this formula but simply applied the .corr() function of Pandas.
+\bigskip
+
+%Describe conditional probability calculation (methodology 2) in mathematics
+In \textbf{Methodology$_2$}, we calculate the conditional probability of a response variable given an explanatory variable, $\dfrac{P(A\cup B)}{P(B)}$, where deeper explanation can be found at \cite{Walsh-John-B}. This calculation assumes only a relationship between the single explanatory variable and the response and therefore we note that this calculation does \emph{not} model joint probability distributions, because the number of features makes it infeasible to model all combinations of them. While this assumption is not true in practice (see discussion of methodology 1 in Section \ref{sec:Results} for correlation between features), we can nonetheless analyze the likelihood of a given outcome from the perspective of only knowing a single feature (e.g. the chance of death given that one has pneumonia). To give a bound of estimates, we perform this calculation on samples of our dataset, using a sample of a size $N = \dfrac{Length(Dataset)}{4}$. The data is sampled with replacement ("bootstrapped") and the proability is calculated on this sample of the data. We repeat this process 1000 times, and observe the quantiles of the resulting probability estimates to characterize the effect of each explanatory variable on the response. This process is repeated for synthetic, observational, and treatment data, and the details of the calculation $\dfrac{P(A\cup B)}{P(B)}$ is performed using the Pandas library (see the github repository for details of the groupby and division functions).
+
+
+\bigskip
+%Describe logistic regression (methodology 3) in mathematics
+In \textbf{Methodology$_3$} we use a logistic regression model to estimate the probability that the input data ($\textbf{x}$) leads to outcomes ($y_i$), for $i=1, 2, ..., m$, where $m$ is the number of possible labels for the outcome classes and $y_i \in [0, 1]$. In the data we use, an outcome of $1$ corresponds to death, and $0$ to survival. The probability of the two outcomes is then as follows: $$\mathbb{P}(y_i=1|x_i, \beta) = \frac{e^{\beta^T x_i}}{1+e^{\beta^T x_i}}$$
+$$\mathbb{P}(y_i=0|x_i, \beta) = 1 - \mathbb{P}(y_i = 1|x_i, \beta),$$
+
+\noindent where $\beta$ are the coefficients that will be estimated by the model, see \cite{Geron-Aurelien}. 
+
+We also apply a regularization parameter $\lambda \geq 0$, which scales the model parameters. Then, the cost function of the model will be: $$C(\boldsymbol{\beta}) = (\boldsymbol{z} - \boldsymbol{X\beta})^T(\boldsymbol{z} - \boldsymbol{X\beta}) + \lambda \boldsymbol{\beta}^T\boldsymbol{\beta}$$
+
+Where \textbf{X} is the input data and $z$ is the output (true) labels.
+
+We train the logistic regression models on a balanced set of data points sampled from the full data, in order to ensure that the classifier properly learns to predict each class (rather than e.g. predicting only $Death = 0$ because the vast majority of patients survive). After this selection, we define a pipeline for feature selection and hyper-parameter tuning which is applied in randomized-search cross-validation ($CV=500$). This is to ensure that the model parameters are accurate and that we obtain a range of values with which to estimate them.
+
+The logistic regression models will then learn coefficient values from the data corresponding to each feature, where higher coefficient values are predictive of death and negative coefficient values are predictive of survival. Lastly, we select the features with the highest and lowest (i.e. greatest absolute value) coefficients to determine which of them are most predictive of symptoms, for both vaccine side-effects as well as treatment effectiveness. 
+
+We implement the model pipeline, logistic regression model itself, and the cross-validation using the \texttt{statsmodels} package. This is convenient because the library provides functionality to display a model summary, including summary statistics for coefficient values including mean, median, standard deviation error, p-values, and confidence intervals (the last of which we detail in Section \ref{sec:Results}). The full printout of these results can be obtained by running the code contained in the GitHub repository.
