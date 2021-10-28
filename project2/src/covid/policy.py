@@ -6,7 +6,11 @@
 ## outcomes: symptoms (including covid-positive)
 
 import numpy as np
-from aux import symptom_names
+
+try:
+    from aux import symptom_names
+except:
+    from project2.src.covid.aux import symptom_names
 
 
 class Policy:
