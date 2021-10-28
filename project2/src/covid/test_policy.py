@@ -1,7 +1,11 @@
 ## To-Do
 
-import policy
-import simulator
+try:
+    import policy as policy
+    import simulator as simulator
+except:
+    import project2.src.covid.policy as policy
+    import project2.src.covid.simulator as simulator
 
 
 ## Baseline simulator parameters
@@ -10,18 +14,22 @@ n_vaccines = 3
 n_treatments = 4
 
 # symptom names for easy reference
-from aux import symptom_names
+try:
+    from aux import symptom_names
+except:
+    from project2.src.covid.aux import symptom_names
 
 
 # Create the underlying population
 population = simulator.Population(n_genes, n_vaccines, n_treatments)
 X = population.generate(10)
 
-# Make sure that your policy appropriately filters out the population if necessary. This is just a random sample of 1000 people
+# Make sure that your policy appropriately filters out the population if
+# necessary. This is just a random sample of 1000 people.
 
-print("OP");
+print("OP")
 # Generate vaccination results
-v_set = list(range(-1,n_vaccines))
+v_set = list(range(-1, n_vaccines))
 print(v_set)
 vaccine_policy = policy.RandomPolicy(n_vaccines, list(range(-1,n_vaccines))) # make sure to add -1 for 'no vaccine'
 print("X")

@@ -191,9 +191,9 @@ if __name__ == "__main__":
     import pandas
 
     try:
-        import policy
+        import policy as policy
     except:
-        import project2.src.covid.policy
+        import project2.src.covid.policy as policy
 
     n_symptoms = 10
     n_genes = 128
