@@ -10,7 +10,7 @@ import numpy as np
 try:
     from aux import symptom_names
 except:
-    from project2.src.covid.aux import symptom_names
+    from aux import symptom_names
 
 
 class Policy:
@@ -18,8 +18,9 @@ class Policy:
 
     def __init__(self, n_actions, action_set):
         """ Initialise.
-        :param int n_actions: the number of actions
-        :param list action_set: the set of actions
+        Args:
+        n_actions (int): the number of actions
+        action_set (list): the set of actions
         """
         self.n_actions = n_actions
         self.action_set = action_set
@@ -29,27 +30,45 @@ class Policy:
     ## Observe the features, treatments and outcomes of one or more individuals
     def observe(self, features, action, outcomes):
         """ Observe features, actions and outcomes.
-        :param array features
-        :param array actions
-        :param array outcomes
+        Args:
+        features (t*|X| array)
+        actions (t*|A| array)
+        outcomes (t*|Y| array)
+
         """
         pass
 
-    def get_utility(self, features, treatment, outcome):
-        """ Obtain the empirical utility of the policy on a set of one or more people. """
+    def get_utility(self, features, action, outcome):
+        """ Obtain the empirical utility of the policy on a set of one or more people.
+        If there are t individuals with x features, and the action
+
+        Args:
+        features (t*|X| array)
+        actions (t*|A| array)
+        outcomes (t*|Y| array)
+        Returns:
+        Empirical utility of the policy on this data.
+        """
 
         return 0
 
     def get_action(self, features):
-        """ Get actions fro one or more people. """
+        """ Get actions for one or more people.
+        Args:
+        features (t*|X| array)
+        Returns:
+        actions (t*|A| array)
+        """
         return 0
 
 
-## This is a purely random policy!
 class RandomPolicy(Policy):
-    ## Here the utiliy is defined in terms of the outcomes obtained only,
-    # ignoring both the treatment and the previous condition.
-    def get_utility(self, features, treatment, outcome):
+    """ This is a purely random policy!"""
+
+    def get_utility(self, features, action, outcome):
+        """Here the utiliy is defined in terms of the outcomes obtained only,
+        ignoring both the treatment and the previous condition.
+        """
         actions = self.get_action(features)
         utility = 0
         utility -= 0.2 * sum(outcome[:, symptom_names['Covid-Positive']])
@@ -63,9 +82,22 @@ class RandomPolicy(Policy):
         utility -= 100.0 * sum(outcome[:, symptom_names['Death']])
         return utility
 
-
     def get_action(self, features):
-        if (features.ndim > 1):
-            return np.random.choice(self.actions_set, features.shape[0])
-        else:
-            return np.random.choice(self.action_set)
+        """Get a completely random set of actions, but only one for
+        each individual.
+        If there is more than one individual, feature has
+        dimensions t*x matrix, otherwise it is an x-size array.
+
+        It assumes a finite set of actions.
+        Returns:
+        A t*|A| array of actions
+        """
+        n_people = features.shape[0]
+        ##print("Acting for ", n_people, "people");
+        actions = np.zeros([n_people, self.n_actions])
+        for t in range(features.shape[0]):
+            action = np.random.choice(self.action_set)
+            if (action >= 0):
+                actions[t, action] = 1
+
+        return actions

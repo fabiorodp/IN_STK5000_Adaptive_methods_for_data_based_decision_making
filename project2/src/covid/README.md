@@ -13,4 +13,3 @@ It implements a simple test for the policies. You need to build your own code ba
 - Policy.observe()
 - Population.vaccinate()
 - Population.treat()
-- 
