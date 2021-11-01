@@ -246,7 +246,11 @@ class Population:
 # main
 if __name__ == "__main__":
     import pandas
-    import policy
+
+    try:
+        import policy
+    except:
+        import project2.src.covid.policy
 
     n_symptoms = 10
     n_genes = 128
