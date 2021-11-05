@@ -42,7 +42,7 @@ class TrustedCurator:
                [f'Vaccine{i}' for i in range(1, num_vaccines+1)]
 
     def __init__(self, user, password, mode='on'):
-        np.random.seed(1)
+        # np.random.seed(1)
         self.mode = 'on'
         self.user = ''
         if (user in credentials.keys()) and (password == credentials[user]):
@@ -72,10 +72,10 @@ class TrustedCurator:
         )
         return X
 
-    def __get_dataY(self, n_population, actions, mode='on'):
+    def __get_dataY(self, individuals_idxs, actions, mode='on'):
         """Private class function to query real data."""
         Y = self.population.vaccinate(
-            list(range(n_population)),
+            individuals_idxs,
             actions.values
         )
 
@@ -96,7 +96,7 @@ class TrustedCurator:
         )
         return self.X
 
-    def get_outcomes(self, features, actions):
+    def get_outcomes(self, individuals_idxs, actions):
         """
         Give:
         X, A
@@ -104,7 +104,7 @@ class TrustedCurator:
         :return: Y = X x A x Y
         """
         self.Y = self.__get_dataY(
-            n_population=features.shape[0],
+            individuals_idxs=individuals_idxs,
             actions=actions,
             mode=self.mode
         )

@@ -1,10 +1,73 @@
 from sklearn.model_selection import KFold
 from torch.utils.data import Dataset, DataLoader
+import matplotlib.pyplot as plt
 from tqdm import tqdm
+import seaborn as sns
 import pandas as pd
 import numpy as np
 import opendp
 import torch
+
+
+def methodology2(data: pd.DataFrame, explanatories, responses: list):
+    """
+    Function to calculate bootstrapped (1000 times) the conditional
+    probability among features.
+    """
+    cond_dict_f_f = {}
+    cond_dict_f_t = {}
+    cond_dict_t_f = {}
+    cond_dict_t_t = {}
+    for r in responses:
+        for e in explanatories:
+            cond_dict_f_f[f'{r}|{e}'] = []
+            cond_dict_f_t[f'{r}|{e}'] = []
+            cond_dict_t_f[f'{r}|{e}'] = []
+            cond_dict_t_t[f'{r}|{e}'] = []
+
+    for i in range(1000):
+        sample_data = data.sample(frac=0.25, replace=True)
+        for r in responses:
+            for e in explanatories:
+                _prob_explanatory = sample_data.groupby([e]).size().div(
+                    len(sample_data))  # P(explanatory)
+                _prob_response_explanatory = sample_data.groupby(
+                    [r, e]).size().div(
+                    len(sample_data))  # P(response, explanatory)
+                _cprob = _prob_response_explanatory.div(_prob_explanatory,
+                                                        axis=0)
+
+                cond_dict_f_f[f'{r}|{e}'].append(_cprob.iloc[0])
+                print(f'P(not {r}| not {e}) = {_cprob.iloc[0]}')
+
+                cond_dict_f_t[f'{r}|{e}'].append(_cprob.iloc[1])
+                print(f'P(not {r}| {e})  {_cprob.iloc[1]}')
+
+                try:
+                    cond_dict_t_f[f'{r}|{e}'].append(_cprob.iloc[2])
+                    print(f'P({r}| not {e}) = {_cprob.iloc[2]}')
+                except:
+                    cond_dict_t_f[f'{r}|{e}'].append(0)
+                    print(f'P({r}| not {e}) = {0}')
+
+                try:
+                    cond_dict_t_t[f'{r}|{e}'].append(_cprob.iloc[3])
+                    print(f'P({r}|{e}) = {_cprob.iloc[3]}')
+                except:
+                    cond_dict_t_t[f'{r}|{e}'].append(0)
+                    print(f'P({r}|{e}) = {0}')
+
+    conds = [cond_dict_f_f, cond_dict_f_t, cond_dict_t_f, cond_dict_t_t]
+    labels = ['False|False', 'False|True', 'True|False', 'True, True']
+
+    for a, b in zip(conds, labels):
+        sns.boxplot(
+            data=pd.DataFrame(a),
+            orient='h'
+        ).figure.subplots_adjust(left=0.35, bottom=0.15)
+        plt.title(f'Conditional Probabilities {b}')
+        plt.xlabel("P")
+        plt.show()
 
 
 class OurDataset(Dataset):
