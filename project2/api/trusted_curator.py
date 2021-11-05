@@ -18,16 +18,21 @@ class TrustedCurator:
     @staticmethod
     def exponential(x, R, u, sensitivity, epsilon, n=1):
         """
-        :param x: df['Vaccine1']
-        :param R: df['Vaccine1'].unique()
-        :param u:
+        :param x: df['Death']
+        :param R: df['Death'].unique()
+        :param u: self.u(x, values)
         :param sensitivity:
-        :param epsilon:
-        :param n:
+        :param epsilon: 0.1, 0.2, ..., 0.9
+        :param n: len(df["Death"])
         :return:
         """
-        scores = u(x, R)  # score each element in R
-        probs = np.exp(epsilon * scores / 2 / sensitivity)
+        # utility score for each element in R
+        scores = u(x, R)
+
+        # applying mechanism
+        probs = np.exp(epsilon * scores / sensitivity)
+
+        # normalizing
         probs /= probs.sum()
         return np.random.choice(R, n, p=probs)
 
@@ -41,8 +46,8 @@ class TrustedCurator:
                  'Heart-disease', 'Hypertension'] +\
                [f'Vaccine{i}' for i in range(1, num_vaccines+1)]
 
-    def __init__(self, user, password, mode='on'):
-        np.random.seed(1)
+    def __init__(self, user, password, mode='on', epsilon=0.1):
+        # np.random.seed(1)
         self.mode = 'on'
         self.user = ''
         if (user in credentials.keys()) and (password == credentials[user]):
@@ -58,7 +63,9 @@ class TrustedCurator:
             n_treatments=4
         )
 
-    def __get_dataX(self, n_population, mode='on'):
+        self.epsilon = epsilon
+
+    def __get_dataX(self, n_population):
         """Private class function to query real data."""
         X = self.population.generate(
             n_individuals=n_population
@@ -70,12 +77,29 @@ class TrustedCurator:
             num_genes=128,
             num_vaccines=3
         )
-        return X
 
-    def __get_dataY(self, n_population, actions, mode='on'):
+        if self.mode == 'off':
+            return X
+
+        else:
+            X["Age"].apply(lambda x: int(x))  # date of birth is protected
+
+            for i in range(len(X)):  # gender is protected
+                if np.random.randint(0, 2) == 0:
+                    X["Gender"][i] = X["Gender"][i]
+                else:
+                    X["Gender"][i] = np.random.randint(0, 2)
+
+            for i in range(len(X)):  # income is protected
+                sensitivity, epsilon = 1, 0.1
+                X['Income'][i] += np.random.laplace(0, sensitivity / epsilon)
+
+            return X
+
+    def __get_dataY(self, individuals_idxs, actions):
         """Private class function to query real data."""
         Y = self.population.vaccinate(
-            list(range(n_population)),
+            individuals_idxs,
             actions.values
         )
 
@@ -84,7 +108,22 @@ class TrustedCurator:
         Y.columns = ['Covid-Recovered', 'Covid-Positive', 'No_Taste/Smell',
                      'Fever', 'Headache', 'Pneumonia', 'Stomach',
                      'Myocarditis', 'Blood-Clots', 'Death']
-        return Y
+
+        if self.mode == 'off':
+            return Y
+
+        else:
+            new_Y = self.exponential(
+                x=Y["Death"],
+                R=Y["Death"].unique(),
+                u=self.u,
+                sensitivity=1,
+                epsilon=self.epsilon,
+                n=len(Y)
+            )
+
+            Y["Death"] = new_Y
+            return Y
 
     def get_features(self, n_population=100000):
         """
@@ -92,11 +131,10 @@ class TrustedCurator:
         """
         self.X = self.__get_dataX(
             n_population=n_population,
-            mode=self.mode
         )
         return self.X
 
-    def get_outcomes(self, features, actions):
+    def get_outcomes(self, individuals_idxs, actions):
         """
         Give:
         X, A
@@ -104,8 +142,7 @@ class TrustedCurator:
         :return: Y = X x A x Y
         """
         self.Y = self.__get_dataY(
-            n_population=features.shape[0],
+            individuals_idxs=individuals_idxs,
             actions=actions,
-            mode=self.mode
         )
         return self.Y
