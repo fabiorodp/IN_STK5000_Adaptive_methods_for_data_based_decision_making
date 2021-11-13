@@ -2,7 +2,7 @@ try:
     from users import credentials
 except:
     from project2.api.users import credentials
-    import project2.src.covid.simulator as simulator
+    import project2.api.simulator as simulator
 
 import pandas as pd
 import numpy as np
