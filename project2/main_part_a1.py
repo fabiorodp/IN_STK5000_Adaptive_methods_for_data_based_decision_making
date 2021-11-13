@@ -45,7 +45,7 @@ for _ in range(10):
     )
 
 plt.plot(
-    [1, 2, 3, 4, 5, 6, 7, 8, 9],
+    [2, 3, 4, 5, 6, 7, 8, 9, 10],
     pl.ML_expected_utilities,
     color='green',
     marker='o',
@@ -55,8 +55,8 @@ plt.plot(
     label="ML Policy"
 )
 plt.plot(
-    [1, 2, 3, 4, 5, 6, 7, 8, 9],
-    [np.mean(pl.random_expected_utilities) for _ in range(9)],
+    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    [np.mean(pl.random_expected_utilities) for _ in range(10)],
     color='red',
     marker='o',
     linestyle='dashed',
