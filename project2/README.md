@@ -12,3 +12,7 @@ Aurora Poggi: aurorapo@uio.no
 #### For Part a:
 
 To run the program, use the command `python3 main_part_a1.py` and `python3 main_part_a2.py`.
+
+#### For Part b:
+
+To run the program, use the command `python3 main_part_b1.py`.
