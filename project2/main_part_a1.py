@@ -45,7 +45,7 @@ for _ in range(10):
     )
 
 plt.plot(
-    [2, 3, 4, 5, 6, 7, 8, 9, 10],
+    [i for i in range(2, pl.vaccination_stage+1)],
     pl.ML_expected_utilities,
     color='green',
     marker='o',
@@ -55,7 +55,7 @@ plt.plot(
     label="ML Policy"
 )
 plt.plot(
-    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    [i for i in range(1, pl.vaccination_stage+1)],
     [np.mean(pl.random_expected_utilities) for _ in range(10)],
     color='red',
     marker='o',
@@ -65,7 +65,7 @@ plt.plot(
     label="Mean for Random Policy"
 )
 plt.plot(
-    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    [i for i in range(1, pl.vaccination_stage+1)],
     pl.observed_expected_utilities,
     color='orange',
     marker='o',
