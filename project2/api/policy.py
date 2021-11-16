@@ -1,7 +1,9 @@
 try:
     from models import DNN_CV
+    # from sklego.metrics import p_percent_score
 except:
     from project2.api.models import DNN_CV
+    # from project2.sklego.metrics import p_percent_score
 
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.ensemble import RandomForestClassifier
@@ -16,161 +18,8 @@ import matplotlib.pyplot as plt
 class Policy:
     """ A policy for treatment/vaccination. """
 
-    @staticmethod
-    def plot_fairness_age(df, title=''):
-        title_size = 12
-        l30 = df[df["Age"] < 30]
-        bt3060 = df[
-            (df["Age"] > 30) & (df["Age"] < 60)]
-        g60 = df[df["Age"] > 60]
-
-        df1 = pd.DataFrame({
-            'Vaccines': [
-                'Vaccine1', 'Vaccine1', 'Vaccine1',
-                'Vaccine2', 'Vaccine2', 'Vaccine2',
-                'Vaccine3', 'Vaccine3', 'Vaccine3'
-            ],
-            'Ages': [
-                "l30", "bt3060", "g60",
-                "l30", "bt3060", "g60",
-                "l30", "bt3060", "g60",
-            ],
-            'Frequency': [
-                l30.groupby("Vaccine1").size().iloc[1],
-                bt3060.groupby("Vaccine1").size().iloc[1],
-                g60.groupby("Vaccine1").size().iloc[1],
-                l30.groupby("Vaccine2").size().iloc[1],
-                bt3060.groupby("Vaccine2").size().iloc[1],
-                g60.groupby("Vaccine2").size().iloc[1],
-                l30.groupby("Vaccine3").size().iloc[1],
-                bt3060.groupby("Vaccine3").size().iloc[1],
-                g60.groupby("Vaccine3").size().iloc[1],
-            ],
-        })
-
-        sns.barplot(
-            x='Vaccines',
-            y='Frequency',
-            hue="Ages",
-            data=df1,
-            palette="Accent_r",
-        )
-
-        if title != '':
-            plt.title(f"{title}", size=title_size)
-        else:
-            plt.title("Vaccinated Fairness among ages", size=title_size)
-        plt.ylabel("Frequency", size=title_size)
-        plt.xlabel("Vaccines", size=title_size)
-        plt.grid()
-        plt.legend(loc="upper center", bbox_to_anchor=(0.5, 1.15), ncol=3)
-        plt.show()
-
-    @staticmethod
-    def plot_fairness_gender(df, title=''):
-        title_size = 12
-        df1 = pd.DataFrame({
-            'Vaccines': [
-                'Vaccine1', 'Vaccine1',
-                'Vaccine2', 'Vaccine2',
-                'Vaccine3', 'Vaccine3'
-            ],
-            'Genders': [
-                "female", "male",
-                "female", "male",
-                "female", "male"
-            ],
-            'Frequency': [
-                df.groupby(["Gender", "Vaccine1"]).size().iloc[1],
-                df.groupby(["Gender", "Vaccine1"]).size().iloc[3],
-                df.groupby(["Gender", "Vaccine2"]).size().iloc[1],
-                df.groupby(["Gender", "Vaccine2"]).size().iloc[3],
-                df.groupby(["Gender", "Vaccine3"]).size().iloc[1],
-                df.groupby(["Gender", "Vaccine3"]).size().iloc[3],
-            ],
-        })
-
-        sns.barplot(
-            x='Vaccines',
-            y='Frequency',
-            hue="Genders",
-            data=df1,
-            palette="Accent_r",
-            # estimator=np.sum,
-            # ax=ax1
-        )
-
-        if title != '':
-            plt.title(f"{title}", size=title_size)
-        else:
-            plt.title("Vaccinated Fairness among genders", size=title_size)
-        plt.ylabel("Frequency", size=title_size)
-        plt.xlabel("Vaccines", size=title_size)
-        plt.grid()
-        plt.legend(loc="upper center", bbox_to_anchor=(0.5, 1.15), ncol=2)
-        plt.show()
-
-    @staticmethod
-    def plot_fairness_income(df, title=''):
-        title_size = 12
-        _0k2k = df[df["Income"] < 2000]
-        _2k5k = df[(df["Income"] >= 2000) & (df["Income"] < 5000)]
-        _5k10k = df[(df["Income"] >= 5000) & (df["Income"] < 10000)]
-        _10k20k = df[(df["Income"] >= 10000) & (df["Income"] < 20000)]
-        geq20k = df[df["Income"] >= 20000]
-
-        df1 = pd.DataFrame({
-            'Vaccines': [
-                'Vaccine1', 'Vaccine1', 'Vaccine1', 'Vaccine1', 'Vaccine1',
-                'Vaccine2', 'Vaccine2', 'Vaccine2', 'Vaccine2', 'Vaccine2',
-                'Vaccine3', 'Vaccine3', 'Vaccine3', 'Vaccine3', 'Vaccine3'
-            ],
-            'Incomes': [
-                "0k2k", "2k5k", "5k10k", "10k20k", "20k30k",
-                "0k2k", "2k5k", "5k10k", "10k20k", "20k30k",
-                "0k2k", "2k5k", "5k10k", "10k20k", "20k30k",
-            ],
-            'Frequency': [
-                _0k2k.groupby("Vaccine1").size().iloc[1],
-                _2k5k.groupby("Vaccine1").size().iloc[1],
-                _5k10k.groupby("Vaccine1").size().iloc[1],
-                _10k20k.groupby("Vaccine1").size().iloc[1],
-                geq20k.groupby("Vaccine1").size().iloc[1],
-                _0k2k.groupby("Vaccine2").size().iloc[1],
-                _2k5k.groupby("Vaccine2").size().iloc[1],
-                _5k10k.groupby("Vaccine2").size().iloc[1],
-                _10k20k.groupby("Vaccine2").size().iloc[1],
-                geq20k.groupby("Vaccine2").size().iloc[1],
-                _0k2k.groupby("Vaccine3").size().iloc[1],
-                _2k5k.groupby("Vaccine3").size().iloc[1],
-                _5k10k.groupby("Vaccine3").size().iloc[1],
-                _10k20k.groupby("Vaccine3").size().iloc[1],
-                geq20k.groupby("Vaccine3").size().iloc[1],
-            ],
-        })
-
-        sns.barplot(
-            x='Vaccines',
-            y='Frequency',
-            hue="Incomes",
-            data=df1,
-            palette="Accent_r",
-            # estimator=np.sum,
-            # ax=ax1
-        )
-
-        if title != '':
-            plt.title(f"{title}", size=title_size)
-        else:
-            plt.title("Fairness among incomes", size=title_size)
-        plt.ylabel("Frequency", size=title_size)
-        plt.xlabel("Vaccines", size=title_size)
-        plt.grid()
-        plt.legend(loc="upper center", bbox_to_anchor=(0.5, 1.15), ncol=5)
-        plt.show()
-
     def __init__(self, n_actions, action_set, plot_fairness=False,
-                 seed=1, n_jobs=-1):
+                 num_top_features=10, seed=1, n_jobs=-1, fairness=False):
         """ Initialise.
         Args:
         n_actions (int): the number of actions
@@ -188,11 +37,12 @@ class Policy:
                          'Pneumonia', 'Stomach', 'Myocarditis',
                          'Blood-Clots']
 
+        self.comorbidities = ['Asthma', 'Obesity', 'Smoking', 'Diabetes',
+                              'Heart-disease', 'Hypertension']
+
         self.full_training_idxs = ['Age', 'Gender', 'Income'] + \
                                   [f'g{i}' for i in range(1, 128 + 1)] + \
-                                  ['Asthma', 'Obesity', 'Smoking', 'Diabetes',
-                                   'Heart-disease', 'Hypertension'] + \
-                                  self.vaccines
+                                  self.comorbidities + self.vaccines
 
         self.vaccination_stage = 0
         self.response_parameter = "Death"
@@ -227,9 +77,73 @@ class Policy:
 
         # Fairness
         self.plot_fairness = plot_fairness
+        self.fairness = fairness
 
-        # relevant features
-        self.relevant_features = None
+        # for sensitivity study
+        self.num_top_features = num_top_features
+
+        # saved values for plotting
+        self.l30_v1 = []
+        self.l30_v2 = []
+        self.l30_v3 = []
+        self.bt3060_v1 = []
+        self.bt3060_v2 = []
+        self.bt3060_v3 = []
+        self.g60_v1 = []
+        self.g60_v2 = []
+        self.g60_v3 = []
+
+        self.female_v1 = []
+        self.female_v2 = []
+        self.female_v3 = []
+        self.male_v1 = []
+        self.male_v2 = []
+        self.male_v3 = []
+
+        self.i0k10k_v1 = []
+        self.geq10k_v1 = []
+        self.i0k10k_v2 = []
+        self.geq10k_v2 = []
+        self.i0k10k_v3 = []
+        self.geq10k_v3 = []
+
+        # TODO: in test for development
+        self.num_dead = []
+        self.num_vaccinated = []
+
+    def save_fairness_age(self, df):
+        l30 = df[df["Age"] < 30]
+        bt3060 = df[(df["Age"] >= 30) & (df["Age"] <= 60)]
+        g60 = df[df["Age"] > 60]
+
+        self.l30_v1.append(l30.groupby("Vaccine1").size().iloc[1])
+        self.l30_v2.append(l30.groupby("Vaccine2").size().iloc[1])
+        self.l30_v3.append(l30.groupby("Vaccine3").size().iloc[1])
+        self.bt3060_v1.append(bt3060.groupby("Vaccine1").size().iloc[1])
+        self.bt3060_v2.append(bt3060.groupby("Vaccine2").size().iloc[1])
+        self.bt3060_v3.append(bt3060.groupby("Vaccine3").size().iloc[1])
+        self.g60_v1.append(g60.groupby("Vaccine1").size().iloc[1])
+        self.g60_v2.append(g60.groupby("Vaccine2").size().iloc[1])
+        self.g60_v3.append(g60.groupby("Vaccine3").size().iloc[1])
+
+    def save_fairness_gender(self, df):
+        self.female_v1.append(df.groupby(["Gender", "Vaccine1"]).size().iloc[1])
+        self.female_v2.append(df.groupby(["Gender", "Vaccine2"]).size().iloc[1])
+        self.female_v3.append(df.groupby(["Gender", "Vaccine3"]).size().iloc[1])
+        self.male_v1.append(df.groupby(["Gender", "Vaccine1"]).size().iloc[3])
+        self.male_v2.append(df.groupby(["Gender", "Vaccine2"]).size().iloc[3])
+        self.male_v3.append(df.groupby(["Gender", "Vaccine3"]).size().iloc[3])
+
+    def save_fairness_income(self, df):
+        i0k10k = df[df["Income"] < 10000]
+        geq10k = df[df["Income"] >= 10000]
+
+        self.i0k10k_v1.append(i0k10k.groupby("Vaccine1").size().iloc[1])
+        self.geq10k_v1.append(geq10k.groupby("Vaccine1").size().iloc[1])
+        self.i0k10k_v2.append(i0k10k.groupby("Vaccine2").size().iloc[1])
+        self.geq10k_v2.append(geq10k.groupby("Vaccine2").size().iloc[1])
+        self.i0k10k_v3.append(i0k10k.groupby("Vaccine3").size().iloc[1])
+        self.geq10k_v3.append(geq10k.groupby("Vaccine3").size().iloc[1])
 
     def create_new_ml_pipeline(self):
         """Create a pipeline with a randomized search CV and random
@@ -269,8 +183,10 @@ class Policy:
         idx = A.index.to_list()
         Y.index = idx
         X_ = self.not_vaccinated[self.not_vaccinated.index.isin(idx)]
-        X_ = X_.drop(self.symptoms + ["Death"] + self.vaccines,
-                     axis=1)  # dropping old features
+        X_ = X_.drop(
+            self.symptoms + ["Death"] + self.vaccines,
+            axis=1
+        )  # dropping old features
 
         # concatenating applied actions and observed outcomes.
         filtered_outcomes = pd.concat([Y, X_, A], axis=1)
@@ -301,6 +217,9 @@ class Policy:
         self.saved_dead_individuals.index = \
             [i for i in range(len(self.saved_dead_individuals))]
 
+        self.num_vaccinated.append(self.saved_vaccinated.shape[0])
+        self.num_dead.append(self.saved_dead_individuals.shape[0])
+
         return filtered_outcomes
 
     def balance_data(self):
@@ -324,22 +243,28 @@ class Policy:
 
         df_not_dead = df_not_dead.sample(
             n=df_dead.shape[0],
-            replace=True,
+            replace=True,  # try False
             random_state=self.seed,
         )
 
-        self.df_balanced = pd.concat([df_dead, df_not_dead])
-        return self.df_balanced
+        df_balanced = pd.concat([df_dead, df_not_dead])
+        return df_balanced
 
     def sensitivity_study(self, df, num_top_features):
         """Sensitivity study for the correlations between features
         and 'Death'."""
         real_base_corr = df.drop(self.symptoms, axis=1).corr()
 
+        if self.fairness:
+            real_base_corr = df.drop(
+                self.symptoms+["Age", "Gender", "Income"],
+                axis=1
+            ).corr()
+
         real_base_neg_corr = \
-            real_base_corr[self.response_parameter].sort_values().head(30)
+            real_base_corr[self.response_parameter].sort_values().head(50)
         real_base_pos_corr = \
-            real_base_corr[self.response_parameter].sort_values().tail(30)
+            real_base_corr[self.response_parameter].sort_values().tail(50)
 
         top_pos = \
             real_base_pos_corr.index[(-1 - num_top_features):-1].to_list()
@@ -348,9 +273,23 @@ class Policy:
 
         relevant_features = top_neg + top_pos
 
+        # always include vaccines as feature
         for v in self.vaccines:
             if v not in relevant_features:
                 relevant_features += [v]
+
+        """# always include top 2 cormobities
+        self.comorbidities_death = df[["Death"]+self.comorbidities]
+        self.comorbidities_death_corr = self.comorbidities_death.corr()
+        self.top_cormobidities_ = \
+            self.comorbidities_death_corr["Death"].sort_values()
+
+        # try .index[-3:-1].to_list()
+        self.topp_cormobidities = self.top_cormobidities_.index[-3:-1].to_list()
+
+        for c in self.topp_cormobidities:
+            if c not in relevant_features:
+                relevant_features += [c]"""
 
         self.relevant_features = relevant_features
         return relevant_features
@@ -375,27 +314,10 @@ class Policy:
         A = actions
         Y = outcomes
 
-        if self.plot_fairness:
-            self.plot_fairness_age(
-                df=self.not_vaccinated,
-                title=f"Fairness among ages in actions "
-                      f"(stage: {self.vaccination_stage}, "
-                      f"policy: {self.last_policy})"
-            )
-
-            self.plot_fairness_gender(
-                df=self.not_vaccinated,
-                title=f"Fairness between gender in actions "
-                      f"(stage: {self.vaccination_stage}, "
-                      f"policy: {self.last_policy})"
-            )
-
-            self.plot_fairness_income(
-                df=self.not_vaccinated,
-                title=f"Fairness among incomes in actions "
-                      f"(stage: {self.vaccination_stage}, "
-                      f"policy: {self.last_policy})"
-            )
+        # saving data for plotting
+        self.save_fairness_age(df=self.not_vaccinated)
+        self.save_fairness_gender(df=self.not_vaccinated)
+        self.save_fairness_income(df=self.not_vaccinated)
 
         # accumulating and storing database of vaccinated and dead people
         # and return filtered outcomes, i.e., the individuals that received
@@ -452,7 +374,7 @@ class Policy:
         # top 10 negative and top 10 positive features, plus actions.
         relevant_features = self.sensitivity_study(
             df=df_balanced,
-            num_top_features=10
+            num_top_features=self.num_top_features
         )
 
         # fit the pipeline
@@ -610,23 +532,6 @@ class Policy:
         vaccinated = pd.concat([vaccinated, X[X['Vaccine2'] == 1]], axis=0)
         vaccinated = pd.concat([vaccinated, X[X['Vaccine3'] == 1]], axis=0)
         vaccinated = vaccinated[vaccinated["Covid-Positive"] == 1]
-
-        if self.plot_fairness:
-            self.plot_fairness_age(
-                df=vaccinated,
-                title=f"Fairness among ages from sample data "
-                      f"(stage: {self.vaccination_stage})"
-            )
-            self.plot_fairness_gender(
-                df=vaccinated,
-                title=f"Fairness between genders from sample data "
-                      f"(stage: {self.vaccination_stage})"
-            )
-            self.plot_fairness_income(
-                df=vaccinated,
-                title=f"Fairness among incomes from sample data "
-                      f"(stage: {self.vaccination_stage})"
-            )
 
         self.saved_vaccinated = pd.concat(
             [vaccinated,

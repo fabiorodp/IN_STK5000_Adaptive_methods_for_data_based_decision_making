@@ -3,11 +3,15 @@ try:
     from api.trusted_curator import TrustedCurator
     from api.policy import Policy
     from api.models import DNN_CV, OurDataset, methodology2
+    from api.helper import fairness_barplot, fairness_lineplot
+    from api.helper import plot_expected_utilities
 except:
     from project2.api.users import credentials
     from project2.api.trusted_curator import TrustedCurator
     from project2.api.policy import Policy
     from project2.api.models import DNN_CV, OurDataset, methodology2
+    from project2.api.helper import fairness_barplot, fairness_lineplot
+    from project2.api.helper import plot_expected_utilities
 
 import numpy as np
 import pandas as pd
@@ -25,7 +29,9 @@ tc = TrustedCurator(
 pl = Policy(
     n_actions=3,
     action_set=['Vaccine1', 'Vaccine2', 'Vaccine3'],
-    plot_fairness=True
+    plot_fairness=False,
+    num_top_features=10,
+    fairness=False
 )
 
 for _ in range(10):
@@ -45,38 +51,18 @@ for _ in range(10):
         outcomes=Y
     )
 
-plt.plot(
-    [2, 3, 4, 5, 6, 7, 8, 9, 10],
-    pl.ML_expected_utilities,
-    color='green',
-    marker='o',
-    linestyle='dashed',
-    linewidth=2,
-    markersize=5,
-    label="ML Policy"
+# #################### plotting expected utilities
+plot_expected_utilities(pl=pl)
+
+# #################### fairness bar plot for Age, Gender or Income
+fairness_barplot(
+    pl=pl,
+    vaccination_stage=5,    # give here the wanted vaccination stage
+    plot_for='Age'      # or Gender or Income
 )
-plt.plot(
-    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-    [np.mean(pl.random_expected_utilities) for _ in range(10)],
-    color='red',
-    marker='o',
-    linestyle='dashed',
-    linewidth=2,
-    markersize=5,
-    label="Mean for Random Policy"
+
+# #################### fairness line plot for Age, Gender or Income
+fairness_lineplot(
+    pl=pl,
+    plot_for='Age'      # or Gender or Income
 )
-plt.plot(
-    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-    pl.observed_expected_utilities,
-    color='orange',
-    marker='o',
-    linestyle='dashed',
-    linewidth=2,
-    markersize=5,
-    label="Observed Deaths"
-)
-plt.title('Expected utilities for ML and Random vaccination policies')
-plt.xlabel('Vaccination stages')
-plt.ylabel('Estimation for the number of deaths')
-plt.legend()
-plt.show()
