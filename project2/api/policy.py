@@ -83,15 +83,15 @@ class Policy:
         self.num_top_features = num_top_features
 
         # saved values for plotting
-        self.l30_v1 = []
-        self.l30_v2 = []
-        self.l30_v3 = []
+        self.le30_v1 = []
+        self.le30_v2 = []
+        self.le30_v3 = []
         self.bt3060_v1 = []
         self.bt3060_v2 = []
         self.bt3060_v3 = []
-        self.g60_v1 = []
-        self.g60_v2 = []
-        self.g60_v3 = []
+        self.geq60_v1 = []
+        self.geq60_v2 = []
+        self.geq60_v3 = []
 
         self.female_v1 = []
         self.female_v2 = []
@@ -100,49 +100,269 @@ class Policy:
         self.male_v2 = []
         self.male_v3 = []
 
-        self.i0k10k_v1 = []
+        self.bt0k10k_v1 = []
         self.geq10k_v1 = []
-        self.i0k10k_v2 = []
+        self.bt0k10k_v2 = []
         self.geq10k_v2 = []
-        self.i0k10k_v3 = []
+        self.bt0k10k_v3 = []
         self.geq10k_v3 = []
+
+        self.pa_v1 = []
+        self.pa_v2 = []
+        self.pa_v3 = []
+
+        self.py_a_v1 = []
+        self.py_a_v2 = []
+        self.py_a_v3 = []
+
+        self.pav1_y = []
+        self.pav2_y = []
+        self.pav3_y = []
+
+        self.pa_z_bt3060_v1 = []
+        self.pa_z_geq60_v1 = []
+        self.pa_z_leq30_v1 = []
+        self.pa_z_bt3060_v2 = []
+        self.pa_z_geq60_v2 = []
+        self.pa_z_leq30_v2 = []
+        self.pa_z_bt3060_v3 = []
+        self.pa_z_geq60_v3 = []
+        self.pa_z_leq30_v3 = []
+
+        self.pa_z_female_v1 = []
+        self.pa_z_female_v2 = []
+        self.pa_z_female_v3 = []
+        self.pa_z_male_v1 = []
+        self.pa_z_male_v2 = []
+        self.pa_z_male_v3 = []
+
+        self.pa_z_bt0k10k_v1 = []
+        self.pa_z_geq10k_v1 = []
+        self.pa_z_bt0k10k_v2 = []
+        self.pa_z_geq10k_v2 = []
+        self.pa_z_bt0k10k_v3 = []
+        self.pa_z_geq10k_v3 = []
 
         # TODO: in test for development
         self.num_dead = []
         self.num_vaccinated = []
 
-    def save_fairness_age(self, df):
-        l30 = df[df["Age"] < 30]
-        bt3060 = df[(df["Age"] >= 30) & (df["Age"] <= 60)]
-        g60 = df[df["Age"] > 60]
+        self.save_df_not_vaccinated = []
+        self.save_df_vaccinated = []
 
-        self.l30_v1.append(l30.groupby("Vaccine1").size().iloc[1])
-        self.l30_v2.append(l30.groupby("Vaccine2").size().iloc[1])
-        self.l30_v3.append(l30.groupby("Vaccine3").size().iloc[1])
+    def vstack_all(self):
+        all_not_vaccinated = []
+        all_vaccinated = []
+        all_ = []
+
+        for df1, df2 in zip(
+                self.save_df_not_vaccinated,
+                self.save_df_vaccinated
+        ):
+            all_not_vaccinated.append(df1.values)
+            all_vaccinated.append(df2.values)
+            all_.append(np.vstack([df1.values, df2.values]))
+
+        all_not_vaccinated = np.vstack(all_not_vaccinated)
+        df1 = pd.DataFrame(
+            all_not_vaccinated,
+            columns=[self.symptoms+['Death']+self.full_training_idxs]
+        )
+
+        all_vaccinated = np.vstack(all_vaccinated)
+        df2 = pd.DataFrame(
+            all_vaccinated,
+            columns=[self.symptoms+['Death']+self.full_training_idxs]
+        )
+
+        all_ = np.vstack(all_)
+        df3 = pd.DataFrame(
+            all_,
+            columns=[self.symptoms + ['Death'] + self.full_training_idxs]
+        )
+
+        return df1, df2, df3
+
+    def fairness_study(self):
+        # #################### Creating df for fairness computations
+        ages = []
+        for a in self.not_vaccinated['Age']:
+            if a <= 30.:
+                ages.append('leq30')
+            elif (a > 30) and (a < 60):
+                ages.append('bt3060')
+            else:
+                ages.append('geq60')
+
+        incomes = []
+        for a in self.not_vaccinated['Income']:
+            if a < 10000:
+                incomes.append('bt0k10k')
+            else:
+                incomes.append('geq10k')
+
+        df = pd.DataFrame(ages, columns=['Age'])
+        df['Gender'] = self.not_vaccinated['Gender'].to_list()
+        df['Income'] = incomes
+        df['Vaccine1'] = self.not_vaccinated['Vaccine1'].to_list()
+        df['Vaccine2'] = self.not_vaccinated['Vaccine2'].to_list()
+        df['Vaccine3'] = self.not_vaccinated['Vaccine3'].to_list()
+        df['Death'] = self.not_vaccinated['Death'].to_list()
+
+        crosstable = pd.crosstab(
+            index=df['Death'],
+            columns=df['Vaccine1'],
+            margins=True
+        )
+
+        # P_\theta^\pi(a='Vaccines')
+        # P_\theta^\pi(a='Vaccines')
+        for v, pa, py_a, pa_y in zip(
+            self.vaccines,
+            [self.pa_v1, self.pa_v2, self.pa_v3],
+            [self.py_a_v1, self.py_a_v2, self.py_a_v3],
+            [self.pav1_y, self.pav2_y, self.pav3_y]
+        ):
+
+            # P_\theta^\pi(a='Vaccines')
+            # for fairness computations
+            pa.append(
+                self.not_vaccinated[v].sum() /
+                self.not_vaccinated.shape[0]
+            )
+
+            crosstable = pd.crosstab(
+                index=df['Death'],
+                columns=df[v],
+                margins=True
+            )
+
+            # P_\theta^\pi(y='Death' | a='Vaccines')
+            # for fairness calibration computations
+            py_a.append(
+                crosstable[1.0][1] / crosstable[1.0][2]
+            )
+
+            crosstable = pd.crosstab(
+                index=df[v],
+                columns=df['Death'],
+                margins=True
+            )
+
+            # P_\theta^\pi(a='Vaccines' | y='Death')
+            # for fairness balance computations
+            pa_y.append(
+                crosstable[1.0][1] / crosstable[1.0][2]
+            )
+
+        # P_\theta^\pi(a='Vaccines' | z="Ages")
+        for v, a, l in zip(
+                self.vaccines,
+                [
+                    [self.pa_z_bt3060_v1, self.pa_z_geq60_v1,
+                     self.pa_z_leq30_v1],
+                    [self.pa_z_bt3060_v2, self.pa_z_geq60_v2,
+                     self.pa_z_leq30_v2],
+                    [self.pa_z_bt3060_v3, self.pa_z_geq60_v3,
+                     self.pa_z_leq30_v3],
+                ],
+                [
+                    ['bt3060', 'geq60', 'leq30'],
+                    ['bt3060', 'geq60', 'leq30'],
+                    ['bt3060', 'geq60', 'leq30'],
+                ]
+        ):
+            crosstable = pd.crosstab(
+                index=df[v],
+                columns=df['Age'],
+                margins=True
+            )
+
+            a[0].append(crosstable[l[0]][1] / crosstable[l[0]][2])
+            a[1].append(crosstable[l[1]][1] / crosstable[l[1]][2])
+            a[2].append(crosstable[l[2]][1] / crosstable[l[2]][2])
+
+        # P_\theta^\pi(a='Vaccines' | z="Genders")
+        for v, a, l in zip(
+                self.vaccines,
+                [
+                    [self.pa_z_female_v1, self.pa_z_male_v1],
+                    [self.pa_z_female_v2, self.pa_z_male_v2],
+                    [self.pa_z_female_v3, self.pa_z_male_v3],
+                ],
+                [
+                    [0.0, 1.0],  # 0.0 = female, 1.0 = male
+                    [0.0, 1.0],
+                    [0.0, 1.0],
+                ]
+        ):
+            crosstable = pd.crosstab(
+                index=df[v],
+                columns=df['Gender'],
+                margins=True
+            )
+
+            a[0].append(crosstable[l[0]][1] / crosstable[l[0]][2])
+            a[1].append(crosstable[l[1]][1] / crosstable[l[1]][2])
+
+        # P_\theta^\pi(a='Vaccines' | z="Incomes")
+        for v, a, l in zip(
+                self.vaccines,
+                [
+                    [self.pa_z_bt0k10k_v1, self.pa_z_geq10k_v1],
+                    [self.pa_z_bt0k10k_v2, self.pa_z_geq10k_v2],
+                    [self.pa_z_bt0k10k_v3, self.pa_z_geq10k_v3],
+                ],
+                [
+                    ['bt0k10k', 'geq10k'],
+                    ['bt0k10k', 'geq10k'],
+                    ['bt0k10k', 'geq10k'],
+                ]
+        ):
+            crosstable = pd.crosstab(
+                index=df[v],
+                columns=df['Income'],
+                margins=True
+            )
+
+            a[0].append(crosstable[l[0]][1] / crosstable[l[0]][2])
+            a[1].append(crosstable[l[1]][1] / crosstable[l[1]][2])
+
+    def save_fairness_age(self, df):
+        le30 = df[df["Age"] <= 30]
+        bt3060 = df[(df["Age"] > 30) & (df["Age"] < 60)]
+        geq60 = df[df["Age"] >= 60]
+
+        self.le30_v1.append(le30.groupby("Vaccine1").size().iloc[1])
+        self.le30_v2.append(le30.groupby("Vaccine2").size().iloc[1])
+        self.le30_v3.append(le30.groupby("Vaccine3").size().iloc[1])
         self.bt3060_v1.append(bt3060.groupby("Vaccine1").size().iloc[1])
         self.bt3060_v2.append(bt3060.groupby("Vaccine2").size().iloc[1])
         self.bt3060_v3.append(bt3060.groupby("Vaccine3").size().iloc[1])
-        self.g60_v1.append(g60.groupby("Vaccine1").size().iloc[1])
-        self.g60_v2.append(g60.groupby("Vaccine2").size().iloc[1])
-        self.g60_v3.append(g60.groupby("Vaccine3").size().iloc[1])
+        self.geq60_v1.append(geq60.groupby("Vaccine1").size().iloc[1])
+        self.geq60_v2.append(geq60.groupby("Vaccine2").size().iloc[1])
+        self.geq60_v3.append(geq60.groupby("Vaccine3").size().iloc[1])
 
     def save_fairness_gender(self, df):
-        self.female_v1.append(df.groupby(["Gender", "Vaccine1"]).size().iloc[1])
-        self.female_v2.append(df.groupby(["Gender", "Vaccine2"]).size().iloc[1])
-        self.female_v3.append(df.groupby(["Gender", "Vaccine3"]).size().iloc[1])
+        self.female_v1.append(
+            df.groupby(["Gender", "Vaccine1"]).size().iloc[1])
+        self.female_v2.append(
+            df.groupby(["Gender", "Vaccine2"]).size().iloc[1])
+        self.female_v3.append(
+            df.groupby(["Gender", "Vaccine3"]).size().iloc[1])
         self.male_v1.append(df.groupby(["Gender", "Vaccine1"]).size().iloc[3])
         self.male_v2.append(df.groupby(["Gender", "Vaccine2"]).size().iloc[3])
         self.male_v3.append(df.groupby(["Gender", "Vaccine3"]).size().iloc[3])
 
     def save_fairness_income(self, df):
-        i0k10k = df[df["Income"] < 10000]
+        bt0k10k = df[df["Income"] < 10000]
         geq10k = df[df["Income"] >= 10000]
 
-        self.i0k10k_v1.append(i0k10k.groupby("Vaccine1").size().iloc[1])
+        self.bt0k10k_v1.append(bt0k10k.groupby("Vaccine1").size().iloc[1])
         self.geq10k_v1.append(geq10k.groupby("Vaccine1").size().iloc[1])
-        self.i0k10k_v2.append(i0k10k.groupby("Vaccine2").size().iloc[1])
+        self.bt0k10k_v2.append(bt0k10k.groupby("Vaccine2").size().iloc[1])
         self.geq10k_v2.append(geq10k.groupby("Vaccine2").size().iloc[1])
-        self.i0k10k_v3.append(i0k10k.groupby("Vaccine3").size().iloc[1])
+        self.bt0k10k_v3.append(bt0k10k.groupby("Vaccine3").size().iloc[1])
         self.geq10k_v3.append(geq10k.groupby("Vaccine3").size().iloc[1])
 
     def create_new_ml_pipeline(self):
@@ -167,7 +387,7 @@ class Policy:
         self.search_pipeline = RandomizedSearchCV(
             estimator=pipeline,
             param_distributions=param_dist,
-            n_iter=100,
+            n_iter=20,
             scoring="accuracy",
             refit=True,
             cv=5,
@@ -257,7 +477,7 @@ class Policy:
 
         if self.fairness:
             real_base_corr = df.drop(
-                self.symptoms+["Age", "Gender", "Income"],
+                self.symptoms + ["Age", "Gender", "Income"],
                 axis=1
             ).corr()
 
@@ -277,19 +497,6 @@ class Policy:
         for v in self.vaccines:
             if v not in relevant_features:
                 relevant_features += [v]
-
-        """# always include top 2 cormobities
-        self.comorbidities_death = df[["Death"]+self.comorbidities]
-        self.comorbidities_death_corr = self.comorbidities_death.corr()
-        self.top_cormobidities_ = \
-            self.comorbidities_death_corr["Death"].sort_values()
-
-        # try .index[-3:-1].to_list()
-        self.topp_cormobidities = self.top_cormobidities_.index[-3:-1].to_list()
-
-        for c in self.topp_cormobidities:
-            if c not in relevant_features:
-                relevant_features += [c]"""
 
         self.relevant_features = relevant_features
         return relevant_features
@@ -313,11 +520,6 @@ class Policy:
         """
         A = actions
         Y = outcomes
-
-        # saving data for plotting
-        self.save_fairness_age(df=self.not_vaccinated)
-        self.save_fairness_gender(df=self.not_vaccinated)
-        self.save_fairness_income(df=self.not_vaccinated)
 
         # accumulating and storing database of vaccinated and dead people
         # and return filtered outcomes, i.e., the individuals that received
@@ -350,6 +552,13 @@ class Policy:
 
         print(f"Observed Expected Utility: "
               f"{self.observed_expected_utility}")
+
+        # saving data for plotting - fairness part
+        self.fairness_study()
+        self.save_fairness_age(df=self.not_vaccinated)
+        self.save_fairness_gender(df=self.not_vaccinated)
+        self.save_fairness_income(df=self.not_vaccinated)
+        self.save_df_not_vaccinated.append(self.not_vaccinated)
 
     def get_utility(self):
         """ Obtain the empirical utility of the policy on a set of one or
@@ -531,6 +740,7 @@ class Policy:
         vaccinated = X[X['Vaccine1'] == 1]
         vaccinated = pd.concat([vaccinated, X[X['Vaccine2'] == 1]], axis=0)
         vaccinated = pd.concat([vaccinated, X[X['Vaccine3'] == 1]], axis=0)
+        self.save_df_vaccinated.append(vaccinated)
         vaccinated = vaccinated[vaccinated["Covid-Positive"] == 1]
 
         self.saved_vaccinated = pd.concat(
