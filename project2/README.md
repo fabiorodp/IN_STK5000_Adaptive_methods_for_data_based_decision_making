@@ -16,3 +16,7 @@ To run the program, use the command `python3 main_part_a1.py` and `python3 main_
 #### For Part b:
 
 To run the program, use the command `python3 main_part_b1.py`.
+
+#### For Part c:
+
+To run the program, use the command `python3 main_part_c.py`.
