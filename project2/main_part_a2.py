@@ -14,7 +14,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-eps = np.arange(0.5, 20, 2)
+eps = np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9])
 saved_ML_expected_utility = []
 saved_observed_expected_utility = []
 
@@ -52,12 +52,20 @@ for _, ep in zip(range(10), eps):
     saved_ML_expected_utility.append(pl.ML_expected_utilities)
     saved_observed_expected_utility.append(pl.observed_expected_utilities)
 
-colors = ["black", "pink", "blue", "orange", "yellow", "green", "red"]
+colors = ["black", "pink", "blue", "orange", "green", "yellow", "red"]
 for c, ML, ov, e in zip(
         colors,
-        saved_ML_expected_utility[:-4],
-        saved_observed_expected_utility[:-4],
-        eps[:-4]
+        np.vstack((saved_ML_expected_utility[4],
+                   saved_ML_expected_utility[5],
+                   saved_ML_expected_utility[6],
+                   saved_ML_expected_utility[7],
+                   saved_ML_expected_utility[8])),
+        np.vstack((saved_observed_expected_utility[4],
+                   saved_observed_expected_utility[5],
+                   saved_observed_expected_utility[6],
+                   saved_observed_expected_utility[7],
+                   saved_observed_expected_utility[8])),
+        np.vstack((eps[4], eps[5], eps[6], eps[7], eps[8]))
 ):
 
     plt.plot(
@@ -73,11 +81,11 @@ for c, ML, ov, e in zip(
 
 plt.plot(
     [1, 2, 3, 4, 5, 6, 7, 8, 9],
-    [140, 90, 55, 45, 80, 38, 30, 30, 25],
+    [134, 113, 94, 61, 29, 39, 28, 33, 25],
     color="purple",
     marker='o',
-    linestyle='solid',
-    linewidth=4,
+    linestyle=':',
+    linewidth=3,
     markersize=5,
     label=f"ML utility without DP"
 )
